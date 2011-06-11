@@ -164,7 +164,7 @@ namespace CORA
 
         }
         /// <summary>
-        /// This method contains collision detection logic. It will process the horizontal movement and then find the appropriate vertical position.
+        /// This method contains collision detection logic. It will process the horizontal movement and then find the appropriate vertical position..
         /// </summary>
         /// <param name="positions">A list containing every point an object intends to check for collisions. This parameter is primarily used to perform different logic on different points. 
         /// For instance, a floor may only need to check the bottom points, and for all other points, may skip any logic at all.</param>
