@@ -27,9 +27,7 @@ namespace CORA
             set { 
                     position.X = value;
                     hitBox.Min.X = value;
-                    hitBox.Max.X = hitBox.Min.X;
-                    if (sprite != null)
-                        hitBox.Max.X += sprite.Width;
+                    hitBox.Max.X = hitBox.Min.X + sprite.Width;
                 }
         }
         public virtual float PosY
@@ -38,9 +36,7 @@ namespace CORA
             set { 
                     position.Y = value;
                     hitBox.Min.Y = value;
-                    hitBox.Max.Y = hitBox.Min.Y;
-                    if (sprite != null)
-                        hitBox.Max.Y += sprite.Height;
+                    hitBox.Max.Y = hitBox.Min.Y + sprite.Height;
                 }
         }
         public override Texture2D Sprite
@@ -108,46 +104,7 @@ namespace CORA
             writer.Write((byte)3);
             writer.Write((float)PosX);
             writer.Write((float)PosY);
-            if (sprite != null)
-            {
-                writer.Write((byte)22);
-                writer.Write((Int16)l.importedTextures.IndexOf(Sprite));
-            }
-            else
-                writer.Write((byte)99);
-            if (name != null || name != "")
-            {
-                writer.Write((byte)22);
-                writer.Write((String)name);
-            }
-            else
-                writer.Write((byte)99);
-        }
-        public override void Export(LevelEditState l, System.Text.StringBuilder texturesDec, System.Text.StringBuilder texturesDef, System.Text.StringBuilder mainString)
-        {
-            string path = l.form.lstTextures.Items[l.importedTextures.IndexOf(this.Sprite)].ToString();
-            string[] tokens = path.Split('\\');
-            path = tokens.Last();
-            path = path.Substring(0, path.IndexOf('.'));
-            if (!texturesDec.ToString().Contains(path))
-            {
-                texturesDec.AppendLine("protected Texture2D " + path + ';');
-                texturesDef.AppendLine(path + " = content.Load<Texture2D>(\"realassets\\\\" + path + "\");");
-            }
-            mainString.AppendLine("this.doodads.Add(new Doodad(path, new Vector2(" + position.X + ", " + position.Y + ")));");
-        }
-        public void Export(LevelEditState l, System.Text.StringBuilder texturesDec, System.Text.StringBuilder texturesDef, System.Text.StringBuilder mainString, Boolean t)
-        {
-            string path = l.form.lstTextures.Items[l.importedTextures.IndexOf(this.Sprite)].ToString();
-            string[] tokens = path.Split('\\');
-            path = tokens.Last();
-            path = path.Substring(0, path.IndexOf('.'));
-            if (!texturesDec.ToString().Contains(path))
-            {
-                texturesDec.AppendLine("protected Texture2D " + path + ';');
-                texturesDef.AppendLine(path + " = content.Load<Texture2D>(\"realassets\\\\" + path + "\");");
-            }
-            mainString.AppendLine("this.background.Add(new Doodad(path, new Vector2(" + position.X + ", " + position.Y + ")));");
+            writer.Write((Int16)l.importedTextures.IndexOf(Sprite));
         }
     }
     public class AnimatedDoodad : Doodad
@@ -275,39 +232,13 @@ namespace CORA
             writer.Write((byte)4);
             writer.Write((float)PosX);
             writer.Write((float)PosY);
-            if (sprite != null)
-            {
-                writer.Write((byte)22);
-                writer.Write((Int16)l.importedTextures.IndexOf(Sprite));
-            }
-            else
-                writer.Write((byte)99);
+            writer.Write((Int16)l.importedTextures.IndexOf(Sprite));
             writer.Write((int)Width);
             writer.Write((int)Height);
             writer.Write((int)Frames);
             writer.Write((int)Rows);
             writer.Write((int)Milliseconds);
             writer.Write((Boolean)Repeat);
-            if (name != null || name != "")
-            {
-                writer.Write((byte)22);
-                writer.Write((String)name);
-            }
-            else
-                writer.Write((byte)99);
-        }
-        public override void Export(LevelEditState l, System.Text.StringBuilder texturesDec, System.Text.StringBuilder texturesDef, System.Text.StringBuilder mainString)
-        {
-            string path = l.form.lstTextures.Items[l.importedTextures.IndexOf(this.Sprite)].ToString();
-            string[] tokens = path.Split('\\');
-            path = tokens.Last();
-            path = path.Substring(0, path.IndexOf('.'));
-            if (!texturesDec.ToString().Contains(path))
-            {
-                texturesDec.AppendLine("protected Texture2D " + path + ';');
-                texturesDef.AppendLine(path + " = content.Load<Texture2D>(\"realassets\\\\" + path + "\");");
-            }
-            mainString.AppendLine("this.doodads.Add(new AnimatedDoodad(" + path + ", " + Width + ", " + Height + ", " + Frames + ", " + Rows + ", " + Repeat + ", " + Milliseconds + ", new Vector2(" + position.X + ", " + position.Y + ")));");
         }
     }
 }

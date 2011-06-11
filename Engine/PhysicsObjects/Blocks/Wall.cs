@@ -53,7 +53,6 @@ namespace CORA
             //If the wall is not nearby, skip all logic and return trajectory.
             if (nearby.Intersects(dimensions))
             {
-                isCollided = false;
                 postCollision.X = 0; //Initialize postCollision
                 postCollision.Y = 0;
                 //Check floors and ceilings
@@ -64,7 +63,6 @@ namespace CORA
                     {
                         player.onGround(); //Confirm player has touched the ground
                         postCollision.Y = dimensions.Min.Y - pos.Y - 1; //Set postcollision. Give one pixel leeway.
-                        isCollided = true;
                     }
                 }
                 else if ((pos.Y >= dimensions.Max.Y && pos.Y + trajectory.Y <= dimensions.Max.Y) //IF: pos.Y is under the bottom line of the box and travels through the line within the bounds of the box's width
@@ -72,46 +70,19 @@ namespace CORA
                     if (pos == positions[0] || pos == positions[1] || pos == positions[2] || pos == positions[3]) //IF: The current position is on the top of the player's hitbox
                     {
                         postCollision.Y = dimensions.Max.Y - pos.Y + 2; //Set postcollision. Give 2 pixels leeway.
-                        isCollided = true;
                     }
                     else { }
-                if(!isCollided)
+                else
                     postCollision.Y = trajectory.Y; //No floor or ceiling collision.
-                isCollided = false;
+
                 //Check walls
                 if ((pos.X >= dimensions.Max.X && pos.X + trajectory.X <= dimensions.Max.X) //IF: pos.x is right of the rightmost side and travels through the rightmost side within the bounds of the box's height
                     && (dimensions.Min.Y <= pos.Y && pos.Y <= dimensions.Max.Y))
-                {
-                    if ((pos == positions[9]) && (dimensions.Min.Y - pos.Y) >= -5)
-                    {
-                        collision.X = -1;
-                        collision.Y = (dimensions.Min.Y - pos.Y) - 1;
-                        player.movePlayer(collision);
-                        isCollided = false;
-                    }
-                    else
-                    {
-                        postCollision.X = dimensions.Max.X - pos.X + 2; //Set postcollision. Give 2 pixels leeway.
-                        isCollided = true;
-                    }
-                }
+                    postCollision.X = dimensions.Max.X - pos.X + 2; //Set postcollision. Give 2 pixels leeway.
                 else if ((pos.X <= dimensions.Min.X && pos.X + trajectory.X >= dimensions.Min.X) //IF: pos.x is left of the leftmost side and travels through the leftmost side within the bounds of the box's height
                     && (dimensions.Min.Y <= pos.Y && pos.Y <= dimensions.Max.Y))
-                {
-                    if ((pos == positions[6]) && (dimensions.Min.Y - pos.Y) >= -5)
-                    {
-                        collision.X = 1;
-                        collision.Y = (dimensions.Min.Y - pos.Y) - 1;
-                        player.movePlayer(collision);
-                        isCollided = false;
-                    }
-                    else
-                    {
-                        postCollision.X = dimensions.Min.X - pos.X - 2; //Set postcollision. Give 2 pixels leeway.
-                        isCollided = true;
-                    }
-                }
-                if(!isCollided)
+                    postCollision.X = dimensions.Min.X - pos.X - 2; //Set postcollision. Give 2 pixels leeway.
+                else
                     postCollision.X = trajectory.X; //No wall collision
                 //If, after the collision detection logic happens, position is still going to end up inside the wall, push it out moving the least amount possible.
                 if (dimensions.Contains(new Vector3(pos.X + postCollision.X, pos.Y + postCollision.Y, 0)) == ContainmentType.Contains)
@@ -183,79 +154,7 @@ namespace CORA
         /// <param name="pack">see drawPacket</param>
         public override void drawThis(drawPacket pack)
         {
-            spriteRect.X = 0;
-            spriteRect.Y = 0;
-            spriteRect.Height = sprite.Height;
-            spriteRect.Width = sprite.Width;
-
-            drawRect.Width = sprite.Width;
-            drawRect.Height = sprite.Height;
-            if (xReps == -1)
-            {
-                drawRect.X = (int)dimensions.Min.X;
-                drawRect.Width = (int)(dimensions.Max.X - dimensions.Min.X);
-                if (yReps == -1)
-                {
-                    drawRect.Y = (int)dimensions.Min.Y;
-                    drawRect.Height = (int)(dimensions.Max.Y - dimensions.Min.Y);
-                    pack.sb.Draw(sprite, drawRect, null, tint, rotation, origin, effect, depth);
-                }
-                else
-                {
-                    for (int j = 0; j <= yReps; j++)
-                    {
-                        drawRect.Y = (int)dimensions.Min.Y + (j * sprite.Height);
-                        if (j == yReps)
-                            if (drawRect.Y < _Height + dimensions.Min.Y)
-                            {
-                                spriteRect.Height = (int)_Height - (j * sprite.Height);
-                                drawRect.Height = spriteRect.Height;
-                            }
-                            else
-                                break;
-                        pack.sb.Draw(sprite, drawRect, spriteRect, tint, rotation, origin, effect, depth);
-                    }
-                }
-            }
-            else
-            {
-                for (int i = 0; i <= xReps; i++)
-                {
-                    drawRect.X = (int)dimensions.Min.X + (i * sprite.Width);
-                    if (i == xReps)
-                        if (drawRect.X < (_Width + dimensions.Min.X))
-                        {
-                            spriteRect.Width = (int)_Width - (i * sprite.Width);
-                            drawRect.Width = spriteRect.Width;
-                        }
-                        else
-                            break;
-                    if (yReps == -1)
-                    {
-                        drawRect.Y = (int)dimensions.Min.Y;
-                        drawRect.Height = (int)(dimensions.Max.Y - dimensions.Min.Y);
-                        pack.sb.Draw(sprite, drawRect, spriteRect, tint, rotation, origin, effect, depth);
-                    }
-                    else
-                    {
-                        for (int j = 0; j <= yReps; j++)
-                        {
-                            drawRect.Y = (int)dimensions.Min.Y + (j * sprite.Height);
-                            if (j == yReps)
-                                if (drawRect.Y < _Height + dimensions.Min.Y)
-                                {
-                                    spriteRect.Height = (int)_Height - (j * sprite.Height);
-                                    drawRect.Height = spriteRect.Height;
-                                }
-                                else
-                                    break;
-                            pack.sb.Draw(sprite, drawRect, spriteRect, tint, rotation, origin, effect, depth);
-                        }
-                        drawRect.Height = sprite.Height;
-                    }
-                }
-            }
-
+            pack.sb.Draw(sprite, new Rectangle((int)dimensions.Min.X, (int)dimensions.Min.Y, (int)(dimensions.Max.X - dimensions.Min.X), (int)(dimensions.Max.Y - dimensions.Min.Y)), Color.White);
         }
         /// <summary>
         /// Returns wall + the minimum coordinates of the hit box
@@ -277,33 +176,7 @@ namespace CORA
             writer.Write((float)MinY);
             writer.Write((float)MaxX);
             writer.Write((float)MaxY);
-            if (sprite != null && l.importedTextures.Contains(sprite))
-            {
-                writer.Write((byte)22);
-                writer.Write((Int16)l.importedTextures.IndexOf(Sprite));
-            }
-            else
-                writer.Write((byte)99);
-            if (name != null || name != "")
-            {
-                writer.Write((byte)22);
-                writer.Write((String)name);
-            }
-            else
-                writer.Write((byte)99);
-        }
-        public override void Export(LevelEditState l, System.Text.StringBuilder texturesDec, System.Text.StringBuilder texturesDef, System.Text.StringBuilder mainString)
-        {
-            string path = l.form.lstTextures.Items[l.importedTextures.IndexOf(this.Sprite)].ToString();
-            string[] tokens = path.Split('\\');
-            path = tokens.Last();
-            path = path.Substring(0, path.IndexOf('.'));
-            if (!texturesDec.ToString().Contains(path))
-            {
-                texturesDec.AppendLine("protected Texture2D " + path + ';');
-                texturesDef.AppendLine(path + " = content.Load<Texture2D>(\"realassets\\\\" + path + "\");");
-            }
-            mainString.AppendLine("this.walls.Add(new Wall(new BoundingBox(new Vector3(" + this._X + ", " + this._Y + ", 0), new Vector3(" + (_X + _Width) + ", " + (_Y + _Height) + ", 0)), this));");
+            writer.Write((Int16)l.importedTextures.IndexOf(Sprite));
         }
     }
 }

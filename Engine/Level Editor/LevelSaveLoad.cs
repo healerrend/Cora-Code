@@ -34,13 +34,14 @@ namespace CORA
                 foreach (Texture2D t in l.importedTextures)
                 {
                     String path = (string)l.form.lstTextures.Items[l.importedTextures.IndexOf(t)];
+                    String name = path.Split('\\').Last();
+                    if(Directory.Exists(Application.ExecutablePath + "Textures"))
+                        Directory.CreateDirectory(Application.ExecutablePath + "Textures");
+                    if(File.Exists(Application.ExecutablePath + "Textures\\" + name))
+                        File.Delete(Application.ExecutablePath + "Textures\\" + name);
+                    File.Copy(path, Application.ExecutablePath + "Textures\\" + name);
                     writer.Write((byte)6);
-                    writer.Write(path);
-                }
-                if (l.underlay != null)
-                {
-                    writer.Write((byte)20);
-                    writer.Write((int)l.importedTextures.IndexOf(l.underlay));
+                    writer.Write(name);
                 }
                 foreach (Doodad d in l.background)
                 {
@@ -82,7 +83,8 @@ namespace CORA
                 FileStream textureStream;
                 while (b == 6) //READ TEXTURES
                 {
-                    String path = reader.ReadString();
+                    String path = Application.ExecutablePath + "Textures\\";
+                    path += reader.ReadString();
                     textureStream = new FileStream(path, FileMode.Open);
                     Texture2D tex = Texture2D.FromStream(graphics, textureStream);
                     l.importedTextures.Add(tex);
@@ -90,11 +92,6 @@ namespace CORA
                     b = reader.ReadByte();
                     textureStream.Close();
 
-                }
-                if (b == 20)
-                {
-                    l.underlay = l.importedTextures[reader.ReadInt32()];
-                    b = reader.ReadByte();
                 }
                 while (b == 1) //READ BACKGROUNDS
                 {
@@ -154,11 +151,10 @@ namespace CORA
                             l.walls.Add((LevelBlock)d);
                             break;
                         default:
-                            d = null;
+                            d = new Wall(null);
                             break;
                     }
-                    if(d != null)
-                        l.form.AddToBlocks(d);
+                    l.form.AddToBlocks(d);
                     b = reader.ReadByte();
                 }
                 reader.Close();
@@ -168,96 +164,41 @@ namespace CORA
                 MessageBox.Show(ex.Message);
             }
         }
-        public static void ExportLevel(LevelEditState l, string filename)
-        {
-            try
-            {
-                if (File.Exists(filename))
-                    File.Delete(filename);
-                FileStream stream = new FileStream(filename, FileMode.Create);
-                StreamWriter writer = new StreamWriter(stream);
-                StringBuilder texturesDec = new StringBuilder();
-                StringBuilder texturesDef = new StringBuilder();
-                StringBuilder mainString = new StringBuilder();
-                mainString.AppendLine("this.levelSize.X = " + l.levelSize.X + ';');
-                mainString.AppendLine("this.levelSize.Y = " + l.levelSize.Y + ';');
-                if (l.underlay != null)
-                {
-                    int i = l.importedTextures.IndexOf(l.underlay);
-                    string path = l.form.lstTextures.Items[i].ToString();
-                    string[] tokens = path.Split('\\');
-                    path = tokens.Last();
-                    path = path.Substring(0, path.IndexOf('.'));
-                    if (!texturesDec.ToString().Contains(path))
-                    {
-                        texturesDec.AppendLine("protected Texture2D " + path + ';');
-                        texturesDef.AppendLine(path + " = content.Load<Texture2D>(\"realassets\\\\" + path + "\");");
-                    }
-                }
-                foreach (Doodad d in l.form.lstBackgrounds.Items)
-                    d.Export(l, texturesDec, texturesDef, mainString, true);
-                foreach (Drawable d in l.form.lstBlocks.Items)
-                    d.Export(l, texturesDec, texturesDef, mainString);
-                writer.Write(texturesDec);
-                writer.Write(texturesDef);
-                writer.Write(mainString);
-                writer.Close();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
-        }
         public static Doodad ReadDoodad(BinaryReader reader, LevelEditState l)
         {
             Doodad d = new Doodad(l.importedTextures[0], new Vector2(0,0));
             d.PosX = reader.ReadSingle();
             d.PosY = reader.ReadSingle();
-            byte b = reader.ReadByte();
-            if(b == 22)
-                d.Sprite = l.importedTextures[reader.ReadInt16()];
-            b = reader.ReadByte();
-            if (b == 22)
-                d.Name = reader.ReadString();
+            d.Sprite = l.importedTextures[reader.ReadInt16()];
             return d;
         }
         public static AnimatedDoodad ReadAnimatedDoodad(BinaryReader reader, LevelEditState l)
         {
-            AnimatedDoodad d = new AnimatedDoodad(null, 0, 0, 0, 0, true, 0, new Vector2(0, 0));
+            AnimatedDoodad d = new AnimatedDoodad(null, 0, 0, 0, 0, true, 0, Vector2.Zero);
             d.PosX = reader.ReadSingle();
             d.PosY = reader.ReadSingle();
-            byte b = reader.ReadByte();
-            if (b == 22)
-                d.Sprite = l.importedTextures[reader.ReadInt16()];
+            d.Sprite = l.importedTextures[reader.ReadInt16()];
             d.Width = reader.ReadInt16();
             d.Height = reader.ReadInt16();
             d.Frames = reader.ReadInt16();
             d.Rows = reader.ReadInt16();
             d.Milliseconds = reader.ReadInt16();
             d.Repeat = reader.ReadBoolean();
-            b = reader.ReadByte();
-            if (b == 22)
-                d.Name = reader.ReadString();
             return d;
         }
         public static ControlPanel ReadControlPanel(BinaryReader reader, LevelEditState l)
         {
-            ControlPanel c = new ControlPanel(new BoundingBox(Vector3.Zero, Vector3.Zero), l, null, null);
+            ControlPanel c = new ControlPanel(new BoundingBox(Vector3.Zero, Vector3.Zero), l, null, null, null);
             c.MinX = reader.ReadSingle();
             c.MinY = reader.ReadSingle();
             c.MaxX = reader.ReadSingle();
             c.MaxY = reader.ReadSingle();
-            byte b = reader.ReadByte();
-            if (b == 22)
-                c.Sprite = l.importedTextures[reader.ReadInt16()];
-            b = reader.ReadByte();
-            if (b == 22)
-                c.Name = reader.ReadString();
+            c.Sprite = l.importedTextures[reader.ReadInt16()];
             return c;
         }
         public static ElevatorSurface ReadElevatorSurface(BinaryReader reader, LevelEditState l)
         {
-            ElevatorSurface e = new ElevatorSurface(new BoundingBox(Vector3.Zero, Vector3.Zero), l, null, true, new Vector2(0,0), new Vector2(0,0));
+            ElevatorSurface e = new ElevatorSurface(new BoundingBox(Vector3.Zero, Vector3.Zero), l, null, true, Vector2.Zero, Vector2.Zero);
             e.MinX = reader.ReadSingle();
             e.MinY = reader.ReadSingle();
             e.MaxX = reader.ReadSingle();
@@ -267,12 +208,7 @@ namespace CORA
             e.EndX = reader.ReadSingle();
             e.EndY = reader.ReadSingle();
             e.isRight = reader.ReadBoolean();
-            byte b = reader.ReadByte();
-            if (b == 22)
-                e.Sprite = l.importedTextures[reader.ReadInt16()];
-            b = reader.ReadByte();
-            if (b == 22)
-                e.Name = reader.ReadString();
+            e.Sprite = l.importedTextures[reader.ReadInt16()];
             return e;
         }
         public static HangingLedge ReadHangingLedge(BinaryReader reader, LevelEditState l)
@@ -285,12 +221,7 @@ namespace CORA
             h.PointX = reader.ReadInt16();
             h.PointY = reader.ReadInt16();
             h.IsRight = reader.ReadBoolean();
-            byte b = reader.ReadByte();
-            if (b == 22)
-                h.Sprite = l.importedTextures[reader.ReadInt16()];
-            b = reader.ReadByte();
-            if (b == 22)
-                h.Name = reader.ReadString();
+            h.Sprite = l.importedTextures[reader.ReadInt16()];
             return h;
         }
         public static MovingHangingLedge ReadMovingHangingLedge(BinaryReader reader, LevelEditState l)
@@ -303,12 +234,7 @@ namespace CORA
             m.PointX = reader.ReadInt16();
             m.PointY = reader.ReadInt16();
             m.IsRight = reader.ReadBoolean();
-            byte b = reader.ReadByte();
-            if (b == 22)
-                m.Sprite = l.importedTextures[reader.ReadInt16()];
-            b = reader.ReadByte();
-            if (b == 22)
-                m.Name = reader.ReadString();
+            m.Sprite = l.importedTextures[reader.ReadInt16()];
             return m;
         }
         public static MovingPlatform ReadMovingPlatform(BinaryReader reader, LevelEditState l)
@@ -323,12 +249,7 @@ namespace CORA
             m.EndX = reader.ReadInt16();
             m.EndY = reader.ReadInt16();
             m.SecondsPerCycle = reader.ReadSingle();
-            byte b = reader.ReadByte();
-            if (b == 22)
-                m.Sprite = l.importedTextures[reader.ReadInt16()];
-            b = reader.ReadByte();
-            if (b == 22)
-                m.Name = reader.ReadString();
+            m.Sprite = l.importedTextures[reader.ReadInt16()];
             return m;
         }
         public static PressurePlate ReadPressurePlate(BinaryReader reader, LevelEditState l)
@@ -338,12 +259,7 @@ namespace CORA
             p.MinY = reader.ReadSingle();
             p.MaxX = reader.ReadSingle();
             p.MaxY = reader.ReadSingle();
-            byte b = reader.ReadByte();
-            if (b == 22)
-                p.Sprite = l.importedTextures[reader.ReadInt16()];
-            b = reader.ReadByte();
-            if (b == 22)
-                p.Name = reader.ReadString();
+            p.Sprite = l.importedTextures[reader.ReadInt16()];
             return p;
         }
         public static Rust ReadRust(BinaryReader reader, LevelEditState l)
@@ -354,28 +270,18 @@ namespace CORA
             r.MaxX = reader.ReadSingle();
             r.MaxY = reader.ReadSingle();
             r.DisappearLength = reader.ReadDouble();
-            byte b = reader.ReadByte();
-            if (b == 22)
-                r.Sprite = l.importedTextures[reader.ReadInt16()];
-            b = reader.ReadByte();
-            if (b == 22)
-                r.Name = reader.ReadString();
+            r.Sprite = l.importedTextures[reader.ReadInt16()];
             return r;
         }
         public static Slope ReadSlope(BinaryReader reader, LevelEditState l)
         {
             Slope s = new Slope(l, new Microsoft.Xna.Framework.Point(), new Microsoft.Xna.Framework.Point());
-            s.StartX = reader.ReadInt32();
-            s.StartY = reader.ReadInt32();
-            s.EndX = reader.ReadInt32();
-            s.EndY = reader.ReadInt32();
-            s.Height = reader.ReadInt32();
-            byte b = reader.ReadByte();
-            if (b == 22)
-                s.Sprite = l.importedTextures[reader.ReadInt16()];
-            b = reader.ReadByte();
-            if (b == 22)
-                s.Name = reader.ReadString();
+            s.StartX = reader.ReadInt16();
+            s.StartY = reader.ReadInt16();
+            s.EndX = reader.ReadInt16();
+            s.EndY = reader.ReadInt16();
+            s.Height = reader.ReadInt16();
+            s.Sprite = l.importedTextures[reader.ReadInt16()];
             return s;
         }
         public static Wall ReadWall(BinaryReader reader, LevelEditState l)
@@ -385,12 +291,7 @@ namespace CORA
             w.MinY = reader.ReadSingle();
             w.MaxX = reader.ReadSingle();
             w.MaxY = reader.ReadSingle();
-            byte b = reader.ReadByte();
-            if (b == 22)
-                w.Sprite = l.importedTextures[reader.ReadInt16()];
-            b = reader.ReadByte();
-            if (b == 22)
-                w.Name = reader.ReadString();
+            w.Sprite = l.importedTextures[reader.ReadInt16()];
             return w;
         }
     }

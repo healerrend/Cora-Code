@@ -149,7 +149,7 @@ namespace CORA
             switch ((DrawableType)cbxBlockTypes.SelectedItem)
             {
                 case DrawableType.controlPanel:
-                    ControlPanel controlPanel = new ControlPanel(new BoundingBox(new Vector3(0, 0, 0), new Vector3(20, 20, 0)), state, null, null);
+                    ControlPanel controlPanel = new ControlPanel(new BoundingBox(new Vector3(0, 0, 0), new Vector3(20, 20, 0)), state, null, null, null);
                     lstBlocks.Items.Add(controlPanel);
                     state.interactables.Add(controlPanel);
                     break;
@@ -370,15 +370,6 @@ namespace CORA
             }
             catch(Exception ex)
             {
-            }
-        }
-
-        private void btnExportLevel_Click(object sender, EventArgs e)
-        {
-            DialogResult d = saveFileDialog1.ShowDialog();
-            if (d == System.Windows.Forms.DialogResult.OK)
-            {
-                LevelSaveLoad.ExportLevel(state, saveFileDialog1.FileName);
             }
         }
     }

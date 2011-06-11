@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Text;
-using System.ComponentModel;
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
@@ -73,42 +71,6 @@ namespace CORA
             get { return height; }
             set { height = value; }
         }
-        [Browsable(false)]
-        public override float _Height
-        {get { return base._Height; }}
-        [Browsable(false)]
-        public override float _Width
-        {get { return base._Width; }}
-        [Browsable(false)]
-        public override float _X
-        { get { return base._X; } }
-        [Browsable(false)]
-        public override float _Y
-        { get { return base._Y; } }
-        [Browsable(false)]
-        public override float MaxX
-        { get { return base.MaxX; } }
-        [Browsable(false)]
-        public override float MaxY
-        {get{return base.MaxY;}}
-        [Browsable(false)]
-        public override float MinX
-        {get{return base.MinX;}}
-        [Browsable(false)]
-        public override float MinY
-        {get{return base.MinY;}}
-        [Browsable(false)]
-        public override float OriginX
-        {get{return base.OriginX;}}
-        [Browsable(false)]
-        public override float OriginY
-        {get{return base.OriginY;}}
-        [Browsable(false)]
-        public override float Rotation
-        {get{return base.Rotation;}}
-        [Browsable(false)]
-        public override bool RepeatY
-        {get{return base.RepeatY;}}
         #endregion
         /// <summary>
         /// Standard constructor.
@@ -158,10 +120,6 @@ namespace CORA
             float run = end.X - start.X;
             slope = rise / run; //lololol
             intercept = start.Y - (start.X * slope);
-            origin.X = 0;
-            origin.Y = 0;
-            rotation = (float)Math.Atan(slope);
-
         }
         /// <summary>
         /// This method contains collision detection logic. It will process the horizontal movement and then find the appropriate vertical position.
@@ -209,18 +167,6 @@ namespace CORA
                         }
                     }
                 }
-                else if ((ascendingRight && pos == positions[0]) || (!ascendingRight && pos == positions[3]))
-                {
-                    if((pos.Y >= height + ((slope * pos.X) + intercept) - 5) && ((pos.Y + trajectory.Y) < (slope * (pos.X + trajectory.X)) + intercept + height))
-                    {
-                        if (dimensions.Min.X <= pos.X && pos.X <= dimensions.Max.X)
-                        {
-                            postCollision.X = 0;
-                            postCollision.Y = 2;
-                            return postCollision;
-                        }
-                    }
-                }
             }
             return trajectory;
         }
@@ -230,39 +176,8 @@ namespace CORA
         /// <param name="pack">see drawPacket</param>
         public override void drawThis(drawPacket pack)
         {
-            float length = (float)Math.Sqrt((Math.Pow((end.X - start.X), 2)) + Math.Pow((end.Y - start.Y), 2));
-            if (repeatX)
-            {
-                float progress = 0;
-                int counter = 0;
-                drawRect.Height = height;
-                drawRect.Width = sprite.Width;
-                spriteRect.X = 0;
-                spriteRect.Y = 0;
-                spriteRect.Height = sprite.Height;
-                spriteRect.Width = sprite.Width;
-                while (progress < length)
-                {
-                    drawRect.X = (int)(start.X + (counter * (Math.Cos(rotation) * sprite.Width)));
-                    drawRect.Y = (int)(start.Y + (counter * (Math.Sin(rotation) * sprite.Width)));
-                    if (length - progress < sprite.Width)
-                    {
-                        drawRect.Width = (int)(length - progress) + 1;
-                        spriteRect.Width = (int)(length - progress);
-                    }
-                    pack.sb.Draw(sprite, drawRect, spriteRect, tint, rotation, origin, effect, depth);
-                    progress += sprite.Width;
-                    counter++;
-                }
-            }
-            else
-            {
-                drawRect.X = start.X;
-                drawRect.Y = start.Y;
-                drawRect.Height = height;
-                drawRect.Width = (int)length + 1;
-                pack.sb.Draw(sprite, drawRect, null, tint, rotation, origin, effect, depth);
-            }
+            pack.sb.Draw(TextureLoader.redsquare, new Vector2(start.X, start.Y), Color.White);
+            //pack.sb.Draw(TextureLoader.redsquare, new Vector2(end.X, end.Y), Color.White);
         }
         /// <summary>
         /// This method always returns false.
@@ -326,33 +241,7 @@ namespace CORA
             writer.Write((int)EndX);
             writer.Write((int)EndY);
             writer.Write((int)Height);
-            if (sprite != null)
-            {
-                writer.Write((byte)22);
-                writer.Write((Int16)l.importedTextures.IndexOf(Sprite));
-            }
-            else
-                writer.Write((byte)99);
-            if (name != null || name != "")
-            {
-                writer.Write((byte)22);
-                writer.Write((String)name);
-            }
-            else
-                writer.Write((byte)99);
-        }
-        public override void Export(LevelEditState l, StringBuilder texturesDec, StringBuilder texturesDef, StringBuilder mainString)
-        {
-            string path = l.form.lstTextures.Items[l.importedTextures.IndexOf(this.Sprite)].ToString();
-            string[] tokens = path.Split('\\');
-            path = tokens.Last();
-            path = path.Substring(0, path.IndexOf('.'));
-            if (!texturesDec.ToString().Contains(path))
-            {
-                texturesDec.AppendLine("protected Texture2D " + path + ';');
-                texturesDef.AppendLine(path + " = content.Load<Texture2D>(\"realassets\\\\" + path + "\");");
-            }
-            mainString.AppendLine("this.walls.Add(new Slope(this, new Point(" + start.X + ", " + start.Y + "), new Point(" + end.X + ", " + end.Y + ")));");
+            writer.Write((Int16)l.importedTextures.IndexOf(Sprite));
         }
     }
 }

@@ -51,8 +51,6 @@
             this.picTexture = new System.Windows.Forms.PictureBox();
             this.btnRemoveTexture = new System.Windows.Forms.Button();
             this.btnImportTexture = new System.Windows.Forms.Button();
-            this.tabPage4 = new System.Windows.Forms.TabPage();
-            this.btnPlayLevel = new System.Windows.Forms.Button();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.btnLoadLevel = new System.Windows.Forms.Button();
             this.btnSaveLevel = new System.Windows.Forms.Button();
@@ -61,7 +59,8 @@
             this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
             this.txtZoomLevel = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
-            this.btnExportLevel = new System.Windows.Forms.Button();
+            this.tabPage4 = new System.Windows.Forms.TabPage();
+            this.btnPlayLevel = new System.Windows.Forms.Button();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tabPage2.SuspendLayout();
@@ -305,25 +304,6 @@
             this.btnImportTexture.UseVisualStyleBackColor = true;
             this.btnImportTexture.Click += new System.EventHandler(this.btnImportTexture_Click);
             // 
-            // tabPage4
-            // 
-            this.tabPage4.Controls.Add(this.btnPlayLevel);
-            this.tabPage4.Location = new System.Drawing.Point(4, 22);
-            this.tabPage4.Name = "tabPage4";
-            this.tabPage4.Size = new System.Drawing.Size(391, 297);
-            this.tabPage4.TabIndex = 3;
-            this.tabPage4.Text = "Player";
-            this.tabPage4.UseVisualStyleBackColor = true;
-            // 
-            // btnPlayLevel
-            // 
-            this.btnPlayLevel.Location = new System.Drawing.Point(301, 3);
-            this.btnPlayLevel.Name = "btnPlayLevel";
-            this.btnPlayLevel.Size = new System.Drawing.Size(87, 65);
-            this.btnPlayLevel.TabIndex = 0;
-            this.btnPlayLevel.Text = "Play Level!";
-            this.btnPlayLevel.UseVisualStyleBackColor = true;
-            // 
             // btnLoadLevel
             // 
             this.btnLoadLevel.Location = new System.Drawing.Point(499, 344);
@@ -381,22 +361,30 @@
             this.label3.TabIndex = 10;
             this.label3.Text = "Zoom:";
             // 
-            // btnExportLevel
+            // tabPage4
             // 
-            this.btnExportLevel.Location = new System.Drawing.Point(337, 344);
-            this.btnExportLevel.Name = "btnExportLevel";
-            this.btnExportLevel.Size = new System.Drawing.Size(75, 23);
-            this.btnExportLevel.TabIndex = 11;
-            this.btnExportLevel.Text = "Export Level";
-            this.btnExportLevel.UseVisualStyleBackColor = true;
-            this.btnExportLevel.Click += new System.EventHandler(this.btnExportLevel_Click);
+            this.tabPage4.Controls.Add(this.btnPlayLevel);
+            this.tabPage4.Location = new System.Drawing.Point(4, 22);
+            this.tabPage4.Name = "tabPage4";
+            this.tabPage4.Size = new System.Drawing.Size(391, 297);
+            this.tabPage4.TabIndex = 3;
+            this.tabPage4.Text = "Player";
+            this.tabPage4.UseVisualStyleBackColor = true;
+            // 
+            // btnPlayLevel
+            // 
+            this.btnPlayLevel.Location = new System.Drawing.Point(301, 3);
+            this.btnPlayLevel.Name = "btnPlayLevel";
+            this.btnPlayLevel.Size = new System.Drawing.Size(87, 65);
+            this.btnPlayLevel.TabIndex = 0;
+            this.btnPlayLevel.Text = "Play Level!";
+            this.btnPlayLevel.UseVisualStyleBackColor = true;
             // 
             // LevelEditForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(586, 379);
-            this.Controls.Add(this.btnExportLevel);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.txtZoomLevel);
             this.Controls.Add(this.btnNewLevel);
@@ -440,6 +428,7 @@
         private System.Windows.Forms.ComboBox cbxBlockTypes;
         private System.Windows.Forms.PropertyGrid propertyGrid1;
         private System.Windows.Forms.Button btnSetSprite;
+        private System.Windows.Forms.ListBox lstBackgrounds;
         private System.Windows.Forms.PropertyGrid backgroundProperties;
         private System.Windows.Forms.Button btnSetBGSprite;
         private System.Windows.Forms.Button btnRemoveBlock;
@@ -453,7 +442,5 @@
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.TabPage tabPage4;
         private System.Windows.Forms.Button btnPlayLevel;
-        private System.Windows.Forms.Button btnExportLevel;
-        public System.Windows.Forms.ListBox lstBackgrounds;
     }
 }

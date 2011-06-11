@@ -40,8 +40,9 @@ namespace CORA
 
         public Boolean hasDoubleJumped = false;   //Are we double jumping?
         public Boolean isDashing = false;
+        public Boolean allowPlayerControl = true;
         public double elapsedTime = 0;
-        public double timeToEndDash = 500; //In miniseconds
+        public double timeToEndDash = 300; //In miniseconds
         #endregion
         #region Static Object Pool
         public static Point poolPoint; //Point, used in the static object pool
@@ -49,15 +50,29 @@ namespace CORA
         public SpriteEffects se; //A sprite Effect
         #endregion
         #region Constants
-        public float HORIZONTAL_ACCELERATION; //Like gravity but over instead of up
-        public float RUN_MULTIPLIER; //How much faster you sprint than run
-        public float JUMP_SPEED; //The velocity you are granted upward when you jump
-        public float DASH_VELOCITY_ACCELERATION = 2;
-        public float DOUBLE_JUMP_ACCELERATION_Y = -20; //Arbitrary number, based on horizonal acceleration.
-        public float DOUBLE_JUMP_ACCELERATION_X = 55;
+        public float HORIZONTAL_ACCELERATION = 2; //Like gravity but over instead of up
+        public float RUN_MULTIPLIER = 2f; //How much faster you sprint than run
+        public float JUMP_SPEED = -22; //The velocity you are granted upward when you jump
+        public float DASH_VELOCITY_ACCELERATION = 15;
+        public float DOUBLE_JUMP_ACCELERATION_Y = -17; //Arbitrary number, based on horizonal acceleration.
+        public float DOUBLE_JUMP_ACCELERATION_X = 15;
 
 
-        #endregion
+        #endregion'
+        /// <summary>
+        /// This constructor is for the minibots to access.
+        /// </summary>
+        public Player(Vector2 position)
+        {
+            isEnableAcceleration = true;
+            this.position = position;
+            nearby = new BoundingSphere(new Vector3(position.X, position.Y, 0f), 50);
+            points = new List<CollisionPoint>();
+            for (int i = 0; i < 12; i++) //Initialize the 12 collision points
+            {
+                points.Add(new CollisionPoint());
+            }
+        }
         /// <summary>
         /// Constructor
         /// </summary>
@@ -86,10 +101,7 @@ namespace CORA
             sprite = s;
             isCrest = false;
             isAirborne = false;
-            HORIZONTAL_ACCELERATION = 2;
-            RUN_MULTIPLIER = 2f;
             GRAVITY = 1.5f;
-            JUMP_SPEED = -25;
             points = new List<CollisionPoint>();
             for (int i = 0; i < 12; i++) //Initialize the 12 collision points
             {
@@ -156,14 +168,16 @@ namespace CORA
                             isRight = false;
                         doPhysics(pack); //Do physics.
                         //Horizontal movement
-                        acceleration.X = pack.controller.moveStickHoriz() * HORIZONTAL_ACCELERATION;
-                        if (isAirborne)
-                            acceleration.X *= .25f; //Horizontal air control 25% of normal
-                        if (pack.controller.run())
-                            acceleration.X *= 2; //This needs to be a variable instead
-                        if (!isAirborne && pack.controller.moveStickHoriz() == 0)
-                            acceleration.X = velocity.X * -.25f; //Friction
-
+                        if (allowPlayerControl)
+                        {
+                            acceleration.X = pack.controller.moveStickHoriz() * HORIZONTAL_ACCELERATION;
+                            if (isAirborne)
+                                acceleration.X *= .25f; //Horizontal air control 25% of normal
+                            if (pack.controller.run())
+                                acceleration.X *= 2; //This needs to be a variable instead
+                            if (!isAirborne && pack.controller.moveStickHoriz() == 0)
+                                acceleration.X = velocity.X * -.25f; //Friction
+                        }
                         if (!hasDoubleJumped)
                         {
                             if (pack.controller.run())
@@ -189,7 +203,9 @@ namespace CORA
                         {
                             elapsedTime = 0;
 
-                            velocity.X += DASH_VELOCITY_ACCELERATION;
+                            velocity.X = DASH_VELOCITY_ACCELERATION;
+                            if (!isRight)
+                                velocity.X *= -1;
                             isDashing = true;
                         }
 
@@ -200,18 +216,16 @@ namespace CORA
                         }
                         else if (pack.controller.jump() && isAirborne && !hasDoubleJumped) //Double Jumping
                         {
-                            if (isRight)
-                            {
-                                velocity.Y = DOUBLE_JUMP_ACCELERATION_Y;
-                                velocity.X += DOUBLE_JUMP_ACCELERATION_X;
-                                hasDoubleJumped = true;
-                            }
+                            if (velocity.Y <= 0)
+                                velocity.Y += DOUBLE_JUMP_ACCELERATION_Y;
                             else
-                            {
                                 velocity.Y = DOUBLE_JUMP_ACCELERATION_Y;
-                                velocity.X -= DOUBLE_JUMP_ACCELERATION_X;
-                                hasDoubleJumped = true;
-                            }
+                            if (isRight)
+                                velocity.X = DOUBLE_JUMP_ACCELERATION_X;
+                            else
+                                velocity.X = -DOUBLE_JUMP_ACCELERATION_X;
+                            hasDoubleJumped = true;
+                            allowPlayerControl = false;
                         }
                         isAirborne = true;
                     }
@@ -224,23 +238,7 @@ namespace CORA
                     //Generic collision detection
                     detectCollisions(pack);
                     //Finalize movement
-
-                    foreach (CollisionPoint p in points) //Move each collision point to set
-                    {
-                        p.X += (int)velocity.X;
-                        p.Y += (int)velocity.Y;
-                    }
-                    hitBox.Min.X = points[0].X; //Move the hitbox
-                    hitBox.Max.X = points[6].X;
-                    hitBox.Min.Y = points[0].Y;
-                    hitBox.Max.Y = points[6].Y;
-                    foreach (LevelBlock w in walls)
-                    {
-                        if (w.intersects(hitBox))
-                        {
-                            //INSERT DEATH/DAMAGE BY CRUSHING HERE
-                        }
-                    }
+                    finalizeMovement(pack);
                 }
                 else if (isHanging) //IF: Hanging
                 {
@@ -301,6 +299,8 @@ namespace CORA
                 //Stay on screen
                 pack.state.playerPosition.X = points[6].X;
                 pack.state.playerPosition.Y = points[6].Y;
+                position.X = points[0].X;
+                position.Y = points[0].Y;
 
                 hitBox.Min.X = points[0].X;
                 hitBox.Min.Y = points[0].Y;
@@ -308,6 +308,29 @@ namespace CORA
                 hitBox.Max.Y = points[6].Y;
                 drawBox.X = (int)points[0].X;
                 drawBox.Y = (int)points[0].Y;
+            }
+        }
+        /// <summary>
+        /// This method will move the hitbox and each collision point on this object in accordance with its final velocity.
+        /// </summary>
+        /// <param name="pack"></param>
+        protected void finalizeMovement(doPacket pack)
+        {
+            foreach (CollisionPoint p in points) //Move each collision point to set
+            {
+                p.X += (int)velocity.X;
+                p.Y += (int)velocity.Y;
+            }
+            hitBox.Min.X = points[0].X; //Move the hitbox
+            hitBox.Max.X = points[6].X;
+            hitBox.Min.Y = points[0].Y;
+            hitBox.Max.Y = points[6].Y;
+            foreach (LevelBlock w in walls)
+            {
+                if (w.intersects(hitBox))
+                {
+                    //INSERT DEATH/DAMAGE BY CRUSHING HERE
+                }
             }
         }
         /// <summary>
@@ -375,6 +398,7 @@ namespace CORA
         {
             isAirborne = false;
             hasDoubleJumped = false;
+            allowPlayerControl = true;
         }
         /// <summary>
         /// This will draw the player

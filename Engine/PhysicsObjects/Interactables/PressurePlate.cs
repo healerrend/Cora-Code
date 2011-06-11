@@ -67,33 +67,7 @@ namespace CORA
             writer.Write((float)MinY);
             writer.Write((float)MaxX);
             writer.Write((float)MaxY);
-            if (sprite != null)
-            {
-                writer.Write((byte)22);
-                writer.Write((Int16)l.importedTextures.IndexOf(Sprite));
-            }
-            else
-                writer.Write((byte)99);
-            if (name != null || name != "")
-            {
-                writer.Write((byte)22);
-                writer.Write((String)name);
-            }
-            else
-                writer.Write((byte)99);
-        }
-        public override void Export(LevelEditState l, System.Text.StringBuilder texturesDec, System.Text.StringBuilder texturesDef, System.Text.StringBuilder mainString)
-        {
-            string path = l.form.lstTextures.Items[l.importedTextures.IndexOf(this.Sprite)].ToString();
-            string[] tokens = path.Split('\\');
-            path = tokens.Last();
-            path = path.Substring(0, path.IndexOf('.'));
-            if (!texturesDec.ToString().Contains(path))
-            {
-                texturesDec.AppendLine("protected Texture2D " + path + ';');
-                texturesDef.AppendLine(path + " = content.Load<Texture2D>(\"realassets\\\\" + path + "\");");
-            }
-            mainString.AppendLine("this.interactables.Add(new PressurePlate(new BoundingBox(new Vector3(" + MinX + ", " + MinY + ", 0), new Vector3(" + MaxX + ", " + MaxY + ", 0)), this, " + path + ", REPLACE ME WITH DELEGATE));");
+            writer.Write((Int16)l.importedTextures.IndexOf(Sprite));
         }
     }
 }

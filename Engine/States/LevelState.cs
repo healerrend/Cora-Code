@@ -41,12 +41,16 @@ namespace CORA
         /// <param name="pack">see doPacket</param>
         public override void doThis(doPacket pack)
         {
-            foreach (LevelBlock l in walls)
-                l.doThis(pack, player);
-            foreach (HitBoxInteractable i in interactables)
-                i.doThis(pack);
-            foreach (GameObject o in objects)
-                o.doThis(pack);
+            try
+            {
+                foreach (LevelBlock l in walls)
+                    l.doThis(pack, player);
+                foreach (HitBoxInteractable i in interactables)
+                    i.doThis(pack);
+                foreach (GameObject o in objects)
+                    o.doThis(pack);
+            }
+            catch{}
         }
 
         //EACH OF THE DRAW METHODS ARE DEFAULTS. Sometimes you may not want to draw all layers.

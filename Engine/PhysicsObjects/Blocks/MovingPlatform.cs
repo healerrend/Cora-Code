@@ -1,5 +1,4 @@
 ﻿using System;
-using System.ComponentModel;
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
@@ -42,7 +41,6 @@ namespace CORA
         /// <summary>
         /// Gets or sets the x component of the beginning point of this object's path
         /// </summary>
-        [Browsable(false)]
         public int BeginX
         {
             get { return begin.X; }
@@ -51,7 +49,6 @@ namespace CORA
         /// <summary>
         /// Gets or sets the Y coponent of the beginning point of this object's path
         /// </summary>
-        [Browsable(false)]
         public int BeginY
         {
             get { return begin.Y; }
@@ -73,7 +70,6 @@ namespace CORA
             get { return end.Y; }
             set { end.Y = value; }
         }
-        [Browsable(false)]
         public override float MinX
         {
             get
@@ -86,7 +82,6 @@ namespace CORA
                 width = dimensions.Max.X - dimensions.Min.X;
             }
         }
-        [Browsable(false)]
         public override float MinY
         {
             get
@@ -99,7 +94,6 @@ namespace CORA
                 height = dimensions.Max.Y - dimensions.Min.Y;
             }
         }
-        [Browsable(false)]
         public override float MaxX
         {
             get
@@ -112,7 +106,6 @@ namespace CORA
                 width = dimensions.Max.X - dimensions.Min.X;
             }
         }
-        [Browsable(false)]
         public override float MaxY
         {
             get
@@ -125,26 +118,22 @@ namespace CORA
                 height = dimensions.Max.Y - dimensions.Min.Y;
             }
         }
-        public override float _X
+        public float Height
         {
-            get
-            {
-                return begin.X;
-            }
+            get { return height; }
             set
             {
-                begin.X = (int)value;
+                height = value;
+                dimensions.Max.Y = dimensions.Min.Y + height;
             }
         }
-        public override float _Y
+        public float Width
         {
-            get
-            {
-                return begin.Y;
-            }
+            get { return width; }
             set
             {
-                begin.Y = (int)value;
+                width = value;
+                dimensions.Max.X = dimensions.Min.X + width;
             }
         }
         public float SecondsPerCycle
@@ -152,18 +141,15 @@ namespace CORA
             get { return secondsPerCycle; }
             set { secondsPerCycle = value; }
         }
-        [Browsable(false)]
         public MovingPlatformRotationType RotationType
         {
             get { return rotationType; }
             set { rotationType = value; }
         }
-        [Browsable(false)]
         public Boolean IsRight
         {
             get { return isRight; }
         }
-        [Browsable(false)]
         public Boolean IsDown
         {
             get { return isDown; }
@@ -225,25 +211,6 @@ namespace CORA
             height = dimensions.Max.Y - dimensions.Min.Y;
             width = dimensions.Max.X - dimensions.Min.X;
         }
-        public MovingPlatform(BoundingBox dimensions, LevelState l, Point begin, Point end, MovingPlatformRotationType rotationType, float secondsPerCycle, Boolean runningHoriz, Boolean runningVert, Texture2D sprite)
-            : base(dimensions, l)
-        {
-            trajectorySet = false;
-            this.dimensions = dimensions;
-            difference = new Vector2();
-            this.secondsPerCycle = secondsPerCycle;
-            this.begin = begin;
-            this.end = end;
-            this.rotationType = rotationType;
-            isDown = true;
-            isRight = true;
-            setAnimator = true;
-            calculateLength();
-            calculateSpeed();
-            height = dimensions.Max.Y - dimensions.Min.Y;
-            width = dimensions.Max.X - dimensions.Min.X;
-            this.sprite = sprite;
-        }
         /// <summary>
         /// This method primarily calls the collision detection from Wall. Then, if there is a collision, it will move the player with it.
         /// </summary>
@@ -299,8 +266,6 @@ namespace CORA
 
                 t = (float)(animator) / (secondsPerCycle * 1000); //Calculate t (0-1)
                 //Set the position of the moving platform.
-                float width = _Width;
-                float height = _Height;
                 if (isRight)
                     dimensions.Min.X = begin.X + ((end.X - begin.X) * t);
                 else
@@ -384,34 +349,7 @@ namespace CORA
             writer.Write((int)EndX);
             writer.Write((int)EndY);
             writer.Write((float)SecondsPerCycle);
-            if (sprite != null)
-            {
-                writer.Write((byte)22);
-                writer.Write((Int16)l.importedTextures.IndexOf(Sprite));
-            }
-            else
-                writer.Write((byte)99);
-            if (name != null || name != "")
-            {
-                writer.Write((byte)22);
-                writer.Write((String)name);
-            }
-            else
-                writer.Write((byte)99);
-        }
-
-        public override void Export(LevelEditState l, System.Text.StringBuilder texturesDec, System.Text.StringBuilder texturesDef, System.Text.StringBuilder mainString)
-        {
-            string path = l.form.lstTextures.Items[l.importedTextures.IndexOf(this.Sprite)].ToString();
-            string[] tokens = path.Split('\\');
-            path = tokens.Last();
-            path = path.Substring(0, path.IndexOf('.'));
-            if (!texturesDec.ToString().Contains(path))
-            {
-                texturesDec.AppendLine("protected Texture2D " + path + ';');
-                texturesDef.AppendLine(path + " = content.Load<Texture2D>(\"realassets\\\\" + path + "\");");
-            }
-            mainString.AppendLine("this.walls.Add(new MovingPlatform(new BoundingBox(new Vector3(" + _X + ", " + _Y + ", 0), new Vector3(" + (_X + _Width) + ", " + (_Y + _Height)+ ", 0)), this, new Point(" + begin.X + ", " + begin.Y + "), new Point(" + end.X + ", " + end.Y + "), MovingPlatformRotationType.Bouncing, " + secondsPerCycle + ", false, false, " + path + "));");
+            writer.Write((Int16)l.importedTextures.IndexOf(Sprite));
         }
     }
 }

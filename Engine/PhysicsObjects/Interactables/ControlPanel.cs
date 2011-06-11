@@ -19,6 +19,7 @@ namespace CORA
     {
         #region Instance Variables
         Delegate target; //The method which this interactable will dynamically invoke
+        DelegateParams parameters;
         #endregion
         /// <summary>
         /// Standard constructor.
@@ -28,13 +29,14 @@ namespace CORA
         /// <param name="s">The sprite for this object</param>
         /// <param name="target">The method this will dynamically invoke</param>
         /// <param name="sprite">Is this required? See pressureplate</param>
-        public ControlPanel(BoundingBox b, LevelState l, Texture2D s, Delegate target)
+        public ControlPanel(BoundingBox b, LevelState l, Texture2D s, Delegate target, DelegateParams parameters)
             : base(b, l, s)
         {
             hitBox = b;
             level = l;
             this.target = target;
             this.Sprite = s;
+            this.parameters = parameters;
         }
         /// <summary>
         /// This method will check for collisions. If a collision is detected, then check to see if this is being activated. If it is, affect the player.
@@ -44,11 +46,18 @@ namespace CORA
         public override Boolean effectPlayer(doPacket pack, Player p)
         {
             //This needs to activate only on collision
-            if (pack.controller.use() || p.type == InteractorType.toolbot)
-                target.DynamicInvoke();
-            if (p.type == InteractorType.toolbot)
+            if (p.hitBox.Intersects(hitBox))
             {
-                int x = 0; //Toolbot interaction animation wot wot
+                if (pack.controller.use() || (p.type == InteractorType.toolbot && ((Toolbot)p).isReleased))
+                {
+                    target.DynamicInvoke(parameters);
+                    return true;
+                }
+                else if (p.type == InteractorType.toolbot)
+                {
+                    int x = 0; //Toolbot interaction animation wot wot
+                    return true;
+                }
             }
             return false;
         }
@@ -72,33 +81,7 @@ namespace CORA
             writer.Write((float)MinY);
             writer.Write((float)MaxX);
             writer.Write((float)MaxY);
-            if (sprite != null)
-            {
-                writer.Write((byte)22);
-                writer.Write((Int16)l.importedTextures.IndexOf(Sprite));
-            }
-            else
-                writer.Write((byte)99);
-            if (name != null || name != "")
-            {
-                writer.Write((byte)22);
-                writer.Write((String)name);
-            }
-            else
-                writer.Write((byte)99);
-        }
-        public override void Export(LevelEditState l, System.Text.StringBuilder texturesDec, System.Text.StringBuilder texturesDef, System.Text.StringBuilder mainString)
-        {
-            string path = l.form.lstTextures.Items[l.importedTextures.IndexOf(this.Sprite)].ToString();
-            string[] tokens = path.Split('\\');
-            path = tokens.Last();
-            path = path.Substring(0, path.IndexOf('.'));
-            if (!texturesDec.ToString().Contains(path))
-            {
-                texturesDec.AppendLine("protected Texture2D " + path + ';');
-                texturesDef.AppendLine(path + " = content.Load<Texture2D>(\"realassets\\\\" + path + "\");");
-            }
-            mainString.AppendLine("this.interactables.Add(new ControlPanel(new BoundingBox(new Vector3(" + MinX + ", " + MinY + ", 0), new Vector3(" + MaxX + ", " + MaxY + ", 0)), this, " + path + ", INSERT DELEGATE HERE));");
+            writer.Write((Int16)l.importedTextures.IndexOf(Sprite));
         }
     }
 }

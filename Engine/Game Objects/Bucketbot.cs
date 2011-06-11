@@ -13,7 +13,7 @@ namespace CORA
 {
     public class Bucketbot : Minibot
     {
-        public Bucketbot(Texture2D s, List<LevelBlock> walls, LevelState l) : base(s, walls, l) { }
+        public Bucketbot(Texture2D s, List<LevelBlock> walls, LevelState l, Vector2 position) : base(s, walls, l, position) { }
         public override void Dock(Player p)
         {
             throw new NotImplementedException();

@@ -57,8 +57,6 @@ namespace CORA
             POSITION_LEVEL_EDIT = new Vector2(400, 460);
             bgImage = content.Load<Texture2D>("junk\\menubg");
             font = content.Load<SpriteFont>("realassets\\arbonnie");
-
-
         }
         /// <summary>
         /// This calls the selection logic and handles the logic for when an item is selected.
