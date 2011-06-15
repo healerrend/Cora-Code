@@ -19,6 +19,7 @@ namespace CORA
     {
         #region Instance Variables
         Delegate target; //The method which this interactable will dynamically invoke
+        DelegateParams parameters;
         #endregion
         /// <summary>
         /// Standard constructor.
@@ -28,13 +29,14 @@ namespace CORA
         /// <param name="s">The sprite for this object</param>
         /// <param name="target">The method this will dynamically invoke</param>
         /// <param name="sprite">Is this required? See pressureplate</param>
-        public ControlPanel(BoundingBox b, LevelState l, Texture2D s, Delegate target)
+        public ControlPanel(BoundingBox b, LevelState l, Texture2D s, Delegate target, DelegateParams parameters)
             : base(b, l, s)
         {
             hitBox = b;
             level = l;
             this.target = target;
             this.Sprite = s;
+            this.parameters = parameters;
         }
         /// <summary>
         /// This method will check for collisions. If a collision is detected, then check to see if this is being activated. If it is, affect the player.
@@ -44,11 +46,18 @@ namespace CORA
         public override Boolean effectPlayer(doPacket pack, Player p)
         {
             //This needs to activate only on collision
-            if (pack.controller.use() || p.type == InteractorType.toolbot)
-                target.DynamicInvoke();
-            if (p.type == InteractorType.toolbot)
+            if (enabled && p.hitBox.Intersects(hitBox))
             {
-                int x = 0; //Toolbot interaction animation wot wot
+                if (pack.controller.use() || (p.type == InteractorType.toolbot && ((Toolbot)p).isReleased))
+                {
+                    target.DynamicInvoke(parameters);
+                    return true;
+                }
+                else if (p.type == InteractorType.toolbot)
+                {
+                    int x = 0; //Toolbot interaction animation wot wot
+                    return true;
+                }
             }
             return false;
         }

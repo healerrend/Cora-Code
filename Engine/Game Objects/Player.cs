@@ -59,6 +59,20 @@ namespace CORA
 
         #endregion
         /// <summary>
+        /// This constructor is for the minibots to access.
+        /// </summary>
+        public Player(Vector2 position)
+        {
+            isEnableAcceleration = true;
+            this.position = position;
+            nearby = new BoundingSphere(new Vector3(position.X, position.Y, 0f), 50);
+            points = new List<CollisionPoint>();
+            for (int i = 0; i < 12; i++) //Initialize the 12 collision points
+            {
+                points.Add(new CollisionPoint());
+            }
+        }
+        /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="s">Sprite</param>
@@ -130,7 +144,7 @@ namespace CORA
         /// <param name="pack">see doPacket</param>
         public override void doThis(doPacket pack)
         {
-            if (!pack.state.paused) //IF: Not paused
+            if (!pack.state.paused && enabled) //IF: Not paused
             {
                 if (isDashing)
                 {
@@ -311,6 +325,29 @@ namespace CORA
             }
         }
         /// <summary>
+        /// This method will move the hitbox and each collision point on this object in accordance with its final velocity.
+        /// </summary>
+        /// <param name="pack"></param>
+        protected void finalizeMovement(doPacket pack)
+        {
+            foreach (CollisionPoint p in points) //Move each collision point to set
+            {
+                p.X += (int)velocity.X;
+                p.Y += (int)velocity.Y;
+            }
+            hitBox.Min.X = points[0].X; //Move the hitbox
+            hitBox.Max.X = points[6].X;
+            hitBox.Min.Y = points[0].Y;
+            hitBox.Max.Y = points[6].Y;
+            foreach (LevelBlock w in walls)
+            {
+                if (w.intersects(hitBox))
+                {
+                    //INSERT DEATH/DAMAGE BY CRUSHING HERE
+                }
+            }
+        }
+        /// <summary>
         /// This method will update the list of collision points.
         /// </summary>
         protected void updateHitPoints()
@@ -382,21 +419,24 @@ namespace CORA
         /// <param name="pack">see drawPacket</param>
         public override void drawThis(drawPacket pack)
         {
-            if (isRight) //If facing left, flip the sprite.
-                se = SpriteEffects.None;
-            else
-                se = SpriteEffects.FlipHorizontally;
-
-            //THIS NEEDS TO GO
-            animBox.X = ((DateTime.Now.Millisecond / 100) % 10) * 100;
-            animBox.Y = 0;
-            animBox.Width = 100;
-            animBox.Height = 100;
-
-            pack.sb.Draw(sprite, drawBox, new Rectangle(((DateTime.Now.Millisecond / 100) % 10) * 100, 0, 100, 100), Color.White, 0f, Vector2.Zero, se, 0);
-            foreach (CollisionPoint p in points)
+            if (visible)
             {
-                pack.sb.Draw(TextureLoader.redsquare, new Rectangle((int)p.X, (int)p.Y, 1, 1), Color.White);
+                if (isRight) //If facing left, flip the sprite.
+                    se = SpriteEffects.None;
+                else
+                    se = SpriteEffects.FlipHorizontally;
+
+                //THIS NEEDS TO GO
+                animBox.X = ((DateTime.Now.Millisecond / 100) % 10) * 100;
+                animBox.Y = 0;
+                animBox.Width = 100;
+                animBox.Height = 100;
+
+                pack.sb.Draw(sprite, drawBox, new Rectangle(((DateTime.Now.Millisecond / 100) % 10) * 100, 0, 100, 100), Color.White, 0f, Vector2.Zero, se, 0);
+                foreach (CollisionPoint p in points)
+                {
+                    pack.sb.Draw(TextureLoader.redsquare, new Rectangle((int)p.X, (int)p.Y, 1, 1), Color.White);
+                }
             }
         }
         /// <summary>

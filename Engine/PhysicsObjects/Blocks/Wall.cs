@@ -37,6 +37,12 @@ namespace CORA
             dimensions = b;
             level = level;
         }
+        public Wall(BoundingBox b, LevelState l, Texture2D sprite)
+        {
+            dimensions = b;
+            level = level;
+            this.sprite = sprite;
+        }
         /// <summary>
         /// This collision detection will check all four sides and return a final velocity.
         /// </summary>
@@ -51,7 +57,7 @@ namespace CORA
         public override Vector2 detectCollision(List<CollisionPoint> positions, CollisionPoint pos, Vector2 trajectory, BoundingSphere nearby, Player player)
         {
             //If the wall is not nearby, skip all logic and return trajectory.
-            if (nearby.Intersects(dimensions))
+            if (nearby.Intersects(dimensions) && enabled)
             {
                 isCollided = false;
                 postCollision.X = 0; //Initialize postCollision
@@ -161,9 +167,7 @@ namespace CORA
                 return postCollision; //Return final velocity
             }
             else
-            {
                 return trajectory; //Return original velocity
-            }
         }
         /// <summary>
         /// Checks intersection between the wall's hitbox and b
@@ -183,58 +187,24 @@ namespace CORA
         /// <param name="pack">see drawPacket</param>
         public override void drawThis(drawPacket pack)
         {
-            spriteRect.X = 0;
-            spriteRect.Y = 0;
-            spriteRect.Height = sprite.Height;
-            spriteRect.Width = sprite.Width;
+            if (visible)
+            {
+                spriteRect.X = 0;
+                spriteRect.Y = 0;
+                spriteRect.Height = sprite.Height;
+                spriteRect.Width = sprite.Width;
 
-            drawRect.Width = sprite.Width;
-            drawRect.Height = sprite.Height;
-            if (xReps == -1)
-            {
-                drawRect.X = (int)dimensions.Min.X;
-                drawRect.Width = (int)(dimensions.Max.X - dimensions.Min.X);
-                if (yReps == -1)
+                drawRect.Width = sprite.Width;
+                drawRect.Height = sprite.Height;
+                if (xReps == -1)
                 {
-                    drawRect.Y = (int)dimensions.Min.Y;
-                    drawRect.Height = (int)(dimensions.Max.Y - dimensions.Min.Y);
-                    pack.sb.Draw(sprite, drawRect, null, tint, rotation, origin, effect, depth);
-                }
-                else
-                {
-                    for (int j = 0; j <= yReps; j++)
-                    {
-                        drawRect.Y = (int)dimensions.Min.Y + (j * sprite.Height);
-                        if (j == yReps)
-                            if (drawRect.Y < _Height + dimensions.Min.Y)
-                            {
-                                spriteRect.Height = (int)_Height - (j * sprite.Height);
-                                drawRect.Height = spriteRect.Height;
-                            }
-                            else
-                                break;
-                        pack.sb.Draw(sprite, drawRect, spriteRect, tint, rotation, origin, effect, depth);
-                    }
-                }
-            }
-            else
-            {
-                for (int i = 0; i <= xReps; i++)
-                {
-                    drawRect.X = (int)dimensions.Min.X + (i * sprite.Width);
-                    if (i == xReps)
-                        if (drawRect.X < (_Width + dimensions.Min.X))
-                        {
-                            spriteRect.Width = (int)_Width - (i * sprite.Width);
-                            drawRect.Width = spriteRect.Width;
-                        }
-                        else
-                            break;
+                    drawRect.X = (int)dimensions.Min.X;
+                    drawRect.Width = (int)(dimensions.Max.X - dimensions.Min.X);
                     if (yReps == -1)
                     {
                         drawRect.Y = (int)dimensions.Min.Y;
                         drawRect.Height = (int)(dimensions.Max.Y - dimensions.Min.Y);
-                        pack.sb.Draw(sprite, drawRect, spriteRect, tint, rotation, origin, effect, depth);
+                        pack.sb.Draw(sprite, drawRect, null, tint, rotation, origin, effect, depth);
                     }
                     else
                     {
@@ -251,11 +221,47 @@ namespace CORA
                                     break;
                             pack.sb.Draw(sprite, drawRect, spriteRect, tint, rotation, origin, effect, depth);
                         }
-                        drawRect.Height = sprite.Height;
+                    }
+                }
+                else
+                {
+                    for (int i = 0; i <= xReps; i++)
+                    {
+                        drawRect.X = (int)dimensions.Min.X + (i * sprite.Width);
+                        if (i == xReps)
+                            if (drawRect.X < (_Width + dimensions.Min.X))
+                            {
+                                spriteRect.Width = (int)_Width - (i * sprite.Width);
+                                drawRect.Width = spriteRect.Width;
+                            }
+                            else
+                                break;
+                        if (yReps == -1)
+                        {
+                            drawRect.Y = (int)dimensions.Min.Y;
+                            drawRect.Height = (int)(dimensions.Max.Y - dimensions.Min.Y);
+                            pack.sb.Draw(sprite, drawRect, spriteRect, tint, rotation, origin, effect, depth);
+                        }
+                        else
+                        {
+                            for (int j = 0; j <= yReps; j++)
+                            {
+                                drawRect.Y = (int)dimensions.Min.Y + (j * sprite.Height);
+                                if (j == yReps)
+                                    if (drawRect.Y < _Height + dimensions.Min.Y)
+                                    {
+                                        spriteRect.Height = (int)_Height - (j * sprite.Height);
+                                        drawRect.Height = spriteRect.Height;
+                                    }
+                                    else
+                                        break;
+                                pack.sb.Draw(sprite, drawRect, spriteRect, tint, rotation, origin, effect, depth);
+                            }
+                            drawRect.Height = sprite.Height;
+                        }
                     }
                 }
             }
-
         }
         /// <summary>
         /// Returns wall + the minimum coordinates of the hit box

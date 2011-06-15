@@ -14,10 +14,15 @@ namespace CORA
     public abstract class Minibot : Player
     {
         public Boolean isActive;
-        public Minibot(Texture2D s, List<LevelBlock> walls, LevelState l)
-            : base(s, walls, l)
+        public static BoundingBox poolBox = new BoundingBox();
+        public Minibot(Texture2D s, List<LevelBlock> walls, LevelState l, Vector2 position)
+            : base(position)
         {
             isActive = false;
+            this.walls = walls;
+            this.sprite = s;
+            this.level = l;
+            this.interactables = l.interactables;
         }
         public abstract void LaunchGround(Player p);
         public abstract void LaunchAir(Player p);

@@ -45,6 +45,10 @@ namespace CORA
 
         public Boolean paused; //True if the game is paused, otherwise false.
         public Boolean frameCaptured; //True if the frame has been captured for display during pause, otherwise false.
+        public Boolean acceptPlayerInput = true;
+
+        public Color tint = Color.White;
+
         public Microsoft.Xna.Framework.Storage.StorageContainer storageContainer;
         public Microsoft.Xna.Framework.Storage.StorageDevice storageDevice;
         #endregion

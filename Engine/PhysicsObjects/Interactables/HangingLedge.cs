@@ -73,7 +73,7 @@ namespace CORA
         /// <returns>True if the player has been effected. Otherwise false.</returns>
         public override Boolean effectPlayer(doPacket pack, Player p)
         {
-            if (detectCollision(p.hitBox))
+            if (enabled && detectCollision(p.hitBox))
             {
                 p.hang(pack, this, isRight);
                 return true;
