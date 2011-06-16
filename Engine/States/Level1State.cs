@@ -16,7 +16,19 @@ namespace CORA
     /// </summary>
     public class Level1State : LevelState
     {
+        #region EventFlags
+        public Boolean eventIsHappening = false;
+        public Boolean runningTutorial = false;
+        #endregion
+
         public Texture2D corasprite;
+        public Texture2D runtutorial;
+        public delegate void act(DelegateParams parameters);
+        act activateRunTutorial = Level1State.ActivateRunTutorial;
+        public static void ActivateRunTutorial(DelegateParams parameters)
+        {
+
+        }
 
         public Level1State() { }
 
@@ -28,6 +40,7 @@ namespace CORA
             corasprite = content.Load<Texture2D>("junk\\walksheet");
             TextureLoader.grayblock = content.Load<Texture2D>("junk\\graysquare");
             TextureLoader.redsquare = content.Load<Texture2D>("RealAssets\\redsquare");
+            runtutorial = content.Load<Texture2D>("junk\\runtutorial");
 
             this.levelSize.X = 3350;
             this.levelSize.Y = 720;
@@ -49,6 +62,8 @@ namespace CORA
             this.walls.Add(new Slope(this, new Point(1900, 420), new Point(2500, 330)));
             //this.walls.Add(new Slope(this, new Point(0, 370), new Point(450, 250)));
 
+            interactables.Add(new PressurePlate(new BoundingBox(new Vector3(100,600,0), new Vector3(150,650,0)), this, null, null));
+
             foreach (LevelBlock w in walls)
             {
                 w.Sprite = TextureLoader.grayblock;
@@ -57,7 +72,7 @@ namespace CORA
 
 
             objects.Add(player);
-            player.movePlayer(new Point(100, 550));
+            player.movePlayer(new Point(100, 600));
         }
         public override void doThis(doPacket pack)
         {

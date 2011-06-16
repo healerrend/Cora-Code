@@ -257,20 +257,23 @@ namespace CORA
         /// <returns>A final velocity. If there is no collision, this will return trajectory. Otherwise, it will return a velocity vector appropriate to the collision which took place.</returns>
         public override Vector2 detectCollision(List<CollisionPoint> positions, CollisionPoint pos, Vector2 trajectory, BoundingSphere nearby, Player player)
         {
-            postCollision = base.detectCollision(positions, pos, trajectory, nearby, player); //Use the collision detection from Wall.
-            if (postCollision.X != trajectory.X || postCollision.Y != trajectory.Y && !trajectorySet) //IF: A collision was detected 
+            if (enabled)
             {
-                if (dimensions.Min.X < pos.X && pos.X < dimensions.Max.X) //IF: pos.x is within the X dimensions of the hitbox
+                postCollision = base.detectCollision(positions, pos, trajectory, nearby, player); //Use the collision detection from Wall.
+                if (postCollision.X != trajectory.X || postCollision.Y != trajectory.Y && !trajectorySet) //IF: A collision was detected 
                 {
-                    playerSpeed.X = curSpeed.X; //Move the player
-                    playerSpeed.Y = curSpeed.Y;
-                    player.movePlayer(playerSpeed);
-                    player.onGround();
-                    trajectorySet = true; //We have now moved the player
+                    if (dimensions.Min.X < pos.X && pos.X < dimensions.Max.X) //IF: pos.x is within the X dimensions of the hitbox
+                    {
+                        playerSpeed.X = curSpeed.X; //Move the player
+                        playerSpeed.Y = curSpeed.Y;
+                        player.movePlayer(playerSpeed);
+                        player.onGround();
+                        trajectorySet = true; //We have now moved the player
+                    }
                 }
+                if (pos == positions[11]) //IF: We are done detecting collision
+                    trajectorySet = false; //Reset the switch
             }
-            if (pos == positions[11]) //IF: We are done detecting collision
-                trajectorySet = false; //Reset the switch
             return postCollision;
         }
         /// <summary>

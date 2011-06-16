@@ -34,8 +34,8 @@ namespace CORA
         /// <param name="s">The sprite</param>
         /// <param name="walls">The list of level blocks in the level</param>
         /// <param name="l">The level this belongs to</param>
-        public Elevatorbot(Texture2D s, List<LevelBlock> walls, LevelState l)
-            : base(s, walls, l)
+        public Elevatorbot(Texture2D s, List<LevelBlock> walls, LevelState l, Vector2 position)
+            : base(s, walls, l, position)
         {
             animatorSet = false;
             isElevating = false;

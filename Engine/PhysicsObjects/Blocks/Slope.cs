@@ -149,6 +149,40 @@ namespace CORA
             }
             dimensions = new BoundingBox(new Vector3(x, y, 0), new Vector3(X, Y, 0));
         }
+        public Slope(LevelState l, Point s, Point e, Texture2D sprite)
+        {
+            level = l;
+            height = 33; //This is the minimum height of a slope. NOTE: This should be made configurable
+            start = s;
+            end = e;
+            calculateSlopeIntercept();
+            float X; //Max x
+            float x; //Min X
+            float Y; //Max y
+            float y; //Min y
+            if (s.X < e.X)
+            {
+                x = s.X;
+                X = e.X;
+            }
+            else
+            {
+                x = e.X;
+                X = s.X;
+            }
+            if (s.Y < e.Y)
+            {
+                y = s.Y;
+                Y = e.Y;
+            }
+            else
+            {
+                y = e.Y;
+                Y = s.Y;
+            }
+            dimensions = new BoundingBox(new Vector3(x, y, 0), new Vector3(X, Y, 0));
+            this.sprite = sprite;
+        }
         /// <summary>
         /// This utility method will calculate the slope of the slope and the intercept
         /// </summary>
@@ -176,7 +210,7 @@ namespace CORA
         /// <returns>A final velocity. If there is no collision, this will return trajectory. Otherwise, it will return a velocity vector appropriate to the collision which took place.</returns>
         public override Vector2 detectCollision(List<CollisionPoint> positions, CollisionPoint pos, Vector2 trajectory, BoundingSphere nearby, Player player)
         {
-            if (dimensions.Intersects(nearby)) //If it is nearby
+            if (dimensions.Intersects(nearby) && enabled) //If it is nearby
             {
                 Boolean ascendingRight = false; //Is this slope ascending right?
                 if (slope < 0)
@@ -230,38 +264,41 @@ namespace CORA
         /// <param name="pack">see drawPacket</param>
         public override void drawThis(drawPacket pack)
         {
-            float length = (float)Math.Sqrt((Math.Pow((end.X - start.X), 2)) + Math.Pow((end.Y - start.Y), 2));
-            if (repeatX)
+            if (visible)
             {
-                float progress = 0;
-                int counter = 0;
-                drawRect.Height = height;
-                drawRect.Width = sprite.Width;
-                spriteRect.X = 0;
-                spriteRect.Y = 0;
-                spriteRect.Height = sprite.Height;
-                spriteRect.Width = sprite.Width;
-                while (progress < length)
+                float length = (float)Math.Sqrt((Math.Pow((end.X - start.X), 2)) + Math.Pow((end.Y - start.Y), 2));
+                if (repeatX)
                 {
-                    drawRect.X = (int)(start.X + (counter * (Math.Cos(rotation) * sprite.Width)));
-                    drawRect.Y = (int)(start.Y + (counter * (Math.Sin(rotation) * sprite.Width)));
-                    if (length - progress < sprite.Width)
+                    float progress = 0;
+                    int counter = 0;
+                    drawRect.Height = height;
+                    drawRect.Width = sprite.Width;
+                    spriteRect.X = 0;
+                    spriteRect.Y = 0;
+                    spriteRect.Height = sprite.Height;
+                    spriteRect.Width = sprite.Width;
+                    while (progress < length)
                     {
-                        drawRect.Width = (int)(length - progress) + 1;
-                        spriteRect.Width = (int)(length - progress);
+                        drawRect.X = (int)(start.X + (counter * (Math.Cos(rotation) * sprite.Width)));
+                        drawRect.Y = (int)(start.Y + (counter * (Math.Sin(rotation) * sprite.Width)));
+                        if (length - progress < sprite.Width)
+                        {
+                            drawRect.Width = (int)(length - progress) + 1;
+                            spriteRect.Width = (int)(length - progress);
+                        }
+                        pack.sb.Draw(sprite, drawRect, spriteRect, tint, rotation, origin, effect, depth);
+                        progress += sprite.Width;
+                        counter++;
                     }
-                    pack.sb.Draw(sprite, drawRect, spriteRect, tint, rotation, origin, effect, depth);
-                    progress += sprite.Width;
-                    counter++;
                 }
-            }
-            else
-            {
-                drawRect.X = start.X;
-                drawRect.Y = start.Y;
-                drawRect.Height = height;
-                drawRect.Width = (int)length + 1;
-                pack.sb.Draw(sprite, drawRect, null, tint, rotation, origin, effect, depth);
+                else
+                {
+                    drawRect.X = start.X;
+                    drawRect.Y = start.Y;
+                    drawRect.Height = height;
+                    drawRect.Width = (int)length + 1;
+                    pack.sb.Draw(sprite, drawRect, null, tint, rotation, origin, effect, depth);
+                }
             }
         }
         /// <summary>

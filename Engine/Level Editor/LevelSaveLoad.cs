@@ -242,7 +242,7 @@ namespace CORA
         }
         public static ControlPanel ReadControlPanel(BinaryReader reader, LevelEditState l)
         {
-            ControlPanel c = new ControlPanel(new BoundingBox(Vector3.Zero, Vector3.Zero), l, null, null);
+            ControlPanel c = new ControlPanel(new BoundingBox(Vector3.Zero, Vector3.Zero), l, null, null, null);
             c.MinX = reader.ReadSingle();
             c.MinY = reader.ReadSingle();
             c.MaxX = reader.ReadSingle();

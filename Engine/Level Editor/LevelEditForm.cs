@@ -149,7 +149,7 @@ namespace CORA
             switch ((DrawableType)cbxBlockTypes.SelectedItem)
             {
                 case DrawableType.controlPanel:
-                    ControlPanel controlPanel = new ControlPanel(new BoundingBox(new Vector3(0, 0, 0), new Vector3(20, 20, 0)), state, null, null);
+                    ControlPanel controlPanel = new ControlPanel(new BoundingBox(new Vector3(0, 0, 0), new Vector3(20, 20, 0)), state, null, null, null);
                     lstBlocks.Items.Add(controlPanel);
                     state.interactables.Add(controlPanel);
                     break;

@@ -69,4 +69,50 @@
         doodad,
         animatedDoodad
     }
+
+    public enum CSLCommandType
+    {
+        spawn,
+        create,
+        delete,
+        despawn,
+        move,
+        walk,
+        waittime,
+        waitforinstruction,
+        displaytext,
+        takePlayerControl,
+        givePlayerControl,
+        drawableEnabled,
+        drawableVisible,
+        moveCamera,
+        slideCamera,
+        fade,
+        go,
+        end
+    }
+
+    public enum CSLObjectType
+    {
+        batterybot,
+        bucketbot,
+        cutterbot,
+        elevatorbot,
+        player,
+        rocketbot,
+        swarmbot,
+        toolbot,
+        door,
+        movingplatform,
+        rust,
+        slope,
+        wall,
+        controlpanel,
+        elevatorsurface,
+        hangingledge,
+        movinghangingledge,
+        pressureplate,
+        doodad,
+        animateddoodad
+    }
 }

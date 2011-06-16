@@ -26,7 +26,9 @@ namespace CORA
         public Boolean accelerationEnabled; //True if this object's acceleration should affect its velocity, otherwise false.
         public Texture2D sprite; //This object's sprite
         public BoundingBox hitBox; //This object's hit box.
-        public float GRAVITY; //The acceleration due to gravity for this object, if any.
+        public static float GRAVITY; //The acceleration due to gravity for this object, if any.
+        public Boolean enabled = true;
+        public Boolean visible = true;
         #endregion
         /// <summary>
         /// Standard constructor.
@@ -72,6 +74,10 @@ namespace CORA
             hitBox.Max.X += trajectory.X;
             hitBox.Min.Y += trajectory.Y;
             hitBox.Max.Y += trajectory.Y;
+        }
+        public virtual void moveThis(float x, float y)
+        {
+            moveThis(new Vector2(x, y));
         }
     }
 }

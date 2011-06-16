@@ -24,6 +24,8 @@ namespace CORA
         protected SpriteEffects effect = SpriteEffects.None;
         protected Color tint = Color.White;
         protected Vector2 origin = new Vector2(0, 0);
+        public Boolean enabled = true;
+        public Boolean visible = true;
         public virtual Texture2D Sprite
         {
             get { return sprite; }

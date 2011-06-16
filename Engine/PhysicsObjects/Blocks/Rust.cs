@@ -145,11 +145,14 @@ namespace CORA
         }
         public override void drawThis(drawPacket pack)
         {
-            drawRect.X = (int)_X;
-            drawRect.Y = (int)_Y;
-            drawRect.Width = (int)_Width;
-            drawRect.Height = (int)_Height;
-            pack.sb.Draw(sprite, drawRect, null, tint, rotation, origin, effect, depth);
+            if (visible)
+            {
+                drawRect.X = (int)_X;
+                drawRect.Y = (int)_Y;
+                drawRect.Width = (int)_Width;
+                drawRect.Height = (int)_Height;
+                pack.sb.Draw(sprite, drawRect, null, tint, rotation, origin, effect, depth);
+            }
         }
         public override void Export(LevelEditState l, System.Text.StringBuilder texturesDec, System.Text.StringBuilder texturesDef, System.Text.StringBuilder mainString)
         {

@@ -49,6 +49,37 @@ namespace CORA
             get { return hitBox.Max.Y; }
             set { hitBox.Max.Y = value; }
         }
+        public float _Width
+        {
+            get { return hitBox.Max.X - hitBox.Min.X; }
+            set { hitBox.Max.X = hitBox.Min.X + value; }
+        }
+        public float _Height
+        {
+            get { return hitBox.Max.Y - hitBox.Min.Y; }
+            set { hitBox.Max.Y = hitBox.Min.Y + value; }
+        }
+        public float _X
+        {
+            get { return hitBox.Min.X; }
+            set
+            {
+                float w = _Width;
+                hitBox.Min.X = value;
+                hitBox.Max.X = hitBox.Min.X + w;
+            }
+        }
+        public float _Y
+        {
+            get { return hitBox.Min.Y; }
+            set
+            {
+                float h = _Height;
+                hitBox.Min.Y = value;
+                hitBox.Max.Y = hitBox.Min.Y + h;
+            }
+        }
+
         #endregion
         /// <summary>
         /// Standard constructor.
@@ -84,7 +115,8 @@ namespace CORA
         /// <param name="pack">see drawPacket</param>
         public virtual void drawThis(drawPacket pack)
         {
-            pack.sb.Draw(sprite, drawRect, Color.White);
+            if(visible)
+                pack.sb.Draw(sprite, drawRect, Color.White);
         }
         /// <summary>
         /// Override is required. This method will handle the logic when a collision is detected.
@@ -108,6 +140,11 @@ namespace CORA
             hitBox.Max.Y += trajectory.Y;
             drawRect.X += (int)trajectory.X;
             drawRect.Y += (int)trajectory.Y;
+        }
+        public void moveThis(float x, float y)
+        {
+            _X = x;
+            _Y = y;
         }
         /// <summary>
         /// Returns the minimum coordinate of the hitbox.
