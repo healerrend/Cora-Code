@@ -56,6 +56,11 @@ namespace CORA
                             if(!textures.ContainsKey(command[1]))
                                 textures.Add(command[1], tex);
                             break;
+                        case CSLCommandType.displaytext:
+                            SpriteFont font = c.Load<SpriteFont>(command[1]);
+                            if(!textures.ContainsKey(command[1]))
+                                textures.Add(command[1], font);
+                            break;
                         default:
                             break;
                     }
@@ -359,6 +364,7 @@ namespace CORA
         }
         public void parseDisplayText()
         {
+            events.Add(new DisplayTextEvent(gameState, level, this, (SpriteFont)((ScriptedObject)textures[command[1]]).o, command[2], double.Parse(command[3]), parseCoordinateVector(command[4], command[5]), command[6]));
         }
         public void parseDrawableEnabled()
         {
@@ -416,6 +422,7 @@ namespace CORA
         }
         public void parseFade()
         {
+            events.Add(new FadeEvent(gameState, level, this, command[1], command[2], double.Parse(command[3])));
         }
         public void parseGivePlayerControl()
         {
@@ -548,6 +555,11 @@ namespace CORA
         {
             events.Remove(e);
             GC.Collect();
+        }
+        public void drawThis(drawPacket pack)
+        {
+            foreach (HandledEvent e in events)
+                e.drawThis(pack);
         }
     }
 

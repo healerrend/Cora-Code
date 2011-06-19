@@ -57,17 +57,17 @@ namespace CORA
             double t = timer / duration;
             timer += pack.time.ElapsedGameTime.TotalMilliseconds;
             if (rFadeIn)
-                current.R = rBegin + (t * (rEnd - rBegin));
+                current.R = (byte)(rBegin + (byte)(t * (rEnd - rBegin)));
             else
-                current.R = rEnd + (t * (rBegin - rEnd));
+                current.R = (byte)(rEnd + (byte)(t * (rBegin - rEnd)));
             if (gFadeIn)
-                current.G = gBegin + (t * (gEnd - gBegin));
+                current.G = (byte)(gBegin + (byte)(t * (gEnd - gBegin)));
             else
-                current.G = gEnd + (t * (gBegin - gEnd));
+                current.G = (byte)(gEnd + (byte)(t * (gBegin - gEnd)));
             if (bFadeIn)
-                current.B = bBegin + (t * (bEnd - bBegin));
+                current.B = (byte)(bBegin + (byte)(t * (bEnd - bBegin)));
             else
-                current.B = bEnd + (t * (bBegin - bEnd));
+                current.B = (byte)(bEnd + (byte)(t * (bBegin - bEnd)));
 
                 if (timer >= duration)
                 {
@@ -75,7 +75,7 @@ namespace CORA
                     current.G = end.G;
                     current.B = end.B;
                     gameState.tint = current;
-                    end();
+                    this.end();
                 }
         }
     }
