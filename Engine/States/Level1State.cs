@@ -23,11 +23,12 @@ namespace CORA
 
         public Texture2D corasprite;
         public Texture2D runtutorial;
+        public GameEvent runTuturialEvent;
         public delegate void act(DelegateParams parameters);
         act activateRunTutorial = Level1State.ActivateRunTutorial;
         public static void ActivateRunTutorial(DelegateParams parameters)
         {
-
+            ((EventParams)parameters).level.events[((EventParams)parameters).eventID].execute();
         }
 
         public Level1State() { }
@@ -40,7 +41,11 @@ namespace CORA
             corasprite = content.Load<Texture2D>("junk\\walksheet");
             TextureLoader.grayblock = content.Load<Texture2D>("junk\\graysquare");
             TextureLoader.redsquare = content.Load<Texture2D>("RealAssets\\redsquare");
-            runtutorial = content.Load<Texture2D>("junk\\runtutorial");
+
+            runTuturialEvent = new GameEvent(state, this);
+            runTuturialEvent.loadScript("..\\..\\..\\code\\content\\scripts\\level1.csl", "runtutorial", content);
+            events.Add(runTuturialEvent);
+
 
             this.levelSize.X = 3350;
             this.levelSize.Y = 720;
@@ -62,7 +67,7 @@ namespace CORA
             this.walls.Add(new Slope(this, new Point(1900, 420), new Point(2500, 330)));
             //this.walls.Add(new Slope(this, new Point(0, 370), new Point(450, 250)));
 
-            interactables.Add(new PressurePlate(new BoundingBox(new Vector3(100,600,0), new Vector3(150,650,0)), this, null, null));
+            interactables.Add(new PressurePlate(new BoundingBox(new Vector3(100,600,0), new Vector3(150,650,0)), this, null, activateRunTutorial, new EventParams(this, 0)));
 
             foreach (LevelBlock w in walls)
             {
@@ -108,6 +113,8 @@ namespace CORA
                 d.drawThis(pack);
             foreach (LevelBlock w in walls)
                 w.drawThis(pack);
+            foreach (Doodad d in doodads)
+                d.drawThis(pack);
             foreach (GameObject o in objects)
                 o.drawThis(pack);
             foreach (HitBoxInteractable h in interactables)

@@ -115,7 +115,7 @@ namespace CORA
         /// <param name="pack">see drawPacket</param>
         public virtual void drawThis(drawPacket pack)
         {
-            if(visible)
+            if(visible && sprite != null)
                 pack.sb.Draw(sprite, drawRect, Color.White);
         }
         /// <summary>

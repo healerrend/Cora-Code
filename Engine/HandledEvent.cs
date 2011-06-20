@@ -26,7 +26,7 @@ namespace CORA
         public virtual void end()
         {
             parent.instructionHasCompleted = true;
-            parent.addCleanupEvent(this);
+            parent.cleanupEvent(this);
         }
         public virtual void drawThis(drawPacket pack)
         {

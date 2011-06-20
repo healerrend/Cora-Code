@@ -333,7 +333,7 @@ namespace CORA
         }
         public static PressurePlate ReadPressurePlate(BinaryReader reader, LevelEditState l)
         {
-            PressurePlate p = new PressurePlate(new BoundingBox(), l, null, null);
+            PressurePlate p = new PressurePlate(new BoundingBox(), l, null, null, null);
             p.MinX = reader.ReadSingle();
             p.MinY = reader.ReadSingle();
             p.MaxX = reader.ReadSingle();

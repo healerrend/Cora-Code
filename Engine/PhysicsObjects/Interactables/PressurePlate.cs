@@ -19,6 +19,7 @@ namespace CORA
     {
         #region Instance Variables
         Delegate target; //The method that interacting with this object will invoke.
+        DelegateParams parameters;
         #endregion
         /// <summary>
         /// Standard constructor.
@@ -28,13 +29,14 @@ namespace CORA
         /// <param name="s">The sprite for this object</param>
         /// <param name="target">The method this object will dynamically invoke.</param>
         /// <param name="sprite">Why is there another sprite? Was this an oversight? Investigate.</param>
-        public PressurePlate(BoundingBox b, LevelState l, Texture2D s, Delegate target)
+        public PressurePlate(BoundingBox b, LevelState l, Texture2D s, Delegate target, DelegateParams parameters)
             : base(b, l, s)
         {
             level = l;
             hitBox = b;
             this.target = target;
             this.sprite = s;
+            this.parameters = parameters;
         }
         /// <summary>
         /// This method will check to see if a collision has occurred. If one has, then it will call its delegate method.
@@ -44,7 +46,7 @@ namespace CORA
         public override Boolean effectPlayer(doPacket pack, Player p)
         {
             //METHOD CALL TO DETECT COLLISIONS HERE
-            target.DynamicInvoke();
+            target.DynamicInvoke(parameters);
             return false;
         }
         /// <summary>

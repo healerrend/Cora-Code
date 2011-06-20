@@ -1,0 +1,5 @@
+begin script runtutorial
+spawn doodad junk\\runtutorial c100 c100 $rundoodad
+waittime 5000
+despawn $rundoodad
+@

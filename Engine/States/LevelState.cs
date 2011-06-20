@@ -25,6 +25,7 @@ namespace CORA
         public List<LevelBlock> walls; //A container for all LevelBlocks for this level
         public List<HitBoxInteractable> interactables; //A container for all HitBoxInteractables for this level
         public List<Doodad> doodads;
+        public List<GameEvent> events;
         #endregion
         public LevelState()
         {
@@ -33,6 +34,7 @@ namespace CORA
             interactables = new List<HitBoxInteractable>();
             doodads = new List<Doodad>();
             background = new List<Doodad>();
+            events = new List<GameEvent>();
         }
         /// <summary>
         /// The do method of a level state should propagate the do chain throughout all objects the level contains.
@@ -41,6 +43,8 @@ namespace CORA
         /// <param name="pack">see doPacket</param>
         public override void doThis(doPacket pack)
         {
+            foreach (GameEvent e in events)
+                e.doThis(pack);
             foreach (LevelBlock l in walls)
                 l.doThis(pack, player);
             foreach (HitBoxInteractable i in interactables)

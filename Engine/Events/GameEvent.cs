@@ -10,7 +10,6 @@ using Microsoft.Xna.Framework.GamerServices;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
-
 namespace CORA
 {
     public class GameEvent
@@ -25,9 +24,10 @@ namespace CORA
         protected Hashtable textures;
         public CSLCommandType eventState;
         public List<HandledEvent> events;
+        public List<HandledEvent> cleanup;
+        public Boolean hasExecuted = false;
         public Boolean instructionHasCompleted = false;
         public Boolean waitingForCommand = false;
-
         public GameEvent(GameState gameState, LevelState level)
         {
             this.gameState = gameState;
@@ -38,34 +38,42 @@ namespace CORA
             textures = new Hashtable();
             selectedIndex = 0;
             events = new List<HandledEvent>();
+            cleanup = new List<HandledEvent>();
         }
-        public void loadScript(string path, ContentManager c)
+        public void loadScript(string path, string name, ContentManager c)
         {
             try
             {
                 FileStream stream = new FileStream(path, FileMode.Open);
                 StreamReader reader = new StreamReader(stream);
-                while (!reader.EndOfStream)
+                string s = "";
+                if(!reader.EndOfStream)
+                    s = reader.ReadLine();
+                while (s != "begin script " + name)
+                    s = reader.ReadLine();
+                while (!reader.EndOfStream && reader.Peek() != '@')
                 {
                     command = reader.ReadLine().Split(' ');
                     CSLCommandType o = (CSLCommandType)Enum.Parse(typeof(CSLCommandType), command[0]);
                     switch (o)
                     {
                         case CSLCommandType.spawn:
-                            Texture2D tex = c.Load<Texture2D>(command[1]);
-                            if(!textures.ContainsKey(command[1]))
-                                textures.Add(command[1], tex);
+                            Texture2D tex = c.Load<Texture2D>(command[2]);
+                            if(!textures.ContainsKey(command[2]))
+                                textures.Add(command[2], tex);
                             break;
                         case CSLCommandType.displaytext:
-                            SpriteFont font = c.Load<SpriteFont>(command[1]);
-                            if(!textures.ContainsKey(command[1]))
-                                textures.Add(command[1], font);
+                            SpriteFont font = c.Load<SpriteFont>(command[2]);
+                            if(!textures.ContainsKey(command[2]))
+                                textures.Add(command[2], font);
                             break;
                         default:
                             break;
                     }
                     commands.Add(command);
                 }
+                if(reader.Peek() == '@')
+                    commands.Add(new string[1]{"end"});
             }
             catch (Exception ex)
             {}
@@ -82,12 +90,15 @@ namespace CORA
                 parseCommand();
             foreach (HandledEvent e in events)
                 e.doThis(pack);
+
         }
         public void parseCommand()
         {
             command = commands[selectedIndex];
             selectedIndex++;
             CSLCommandType o = (CSLCommandType)Enum.Parse(typeof(CSLCommandType), command[0]);
+            if (command[0] == "@")
+                o = CSLCommandType.end;
             switch (o)
             {
                 case CSLCommandType.create:
@@ -218,12 +229,12 @@ namespace CORA
                         //FILL IN AFTER DEFINING
                         break;
                     case CSLObjectType.doodad:
-                        b = new Doodad((Texture2D)textures[command[1]], parseCoordinateVector(command[2], command[3]));
-                        if (command.Length > 4 && command[4].StartsWith("$"))
+                        b = new Doodad((Texture2D)textures[command[2]], parseCoordinateVector(command[3], command[4]));
+                        if (command.Length > 5 && command[5].StartsWith("$"))
                         {
-                            if (objects.ContainsKey(command[4]))
-                                objects.Remove(command[4]);
-                            objects.Add(command[4], new ScriptedObject(b, o));
+                            if (objects.ContainsKey(command[5]))
+                                objects.Remove(command[5]);
+                            objects.Add(command[5], new ScriptedObject(b, o));
                         }
                         if (spawn)
                             level.doodads.Add((Doodad)b);
@@ -351,14 +362,14 @@ namespace CORA
                 objects.Remove(command[1]);
                 if (despawn)
                 {
-                    if (level.doodads.Contains(o))
-                        level.doodads.Remove((Doodad)o);
-                    else if (level.objects.Contains(o))
+                    if (level.doodads.Contains(((ScriptedObject)o).o))
+                        level.doodads.Remove((Doodad)((ScriptedObject)o).o);
+                    else if (level.objects.Contains(((ScriptedObject)o).o))
                         level.objects.Remove((GameObject)o);
-                    else if (level.interactables.Contains(o))
-                        level.interactables.Remove((HitBoxInteractable)o);
+                    else if (level.interactables.Contains(((ScriptedObject)o).o))
+                        level.interactables.Remove((HitBoxInteractable)((ScriptedObject)o).o);
                     else if (level.walls.Contains(o))
-                        level.walls.Remove((LevelBlock)o);
+                        level.walls.Remove((LevelBlock)((ScriptedObject)o).o);
                 }
             }
         }
@@ -489,6 +500,10 @@ namespace CORA
         }
         public void parseWalk()
         {
+            Boolean b = true;
+            if (command[5] == "false")
+                b = false;
+            events.Add(new WalkEvent(gameState, level, this, ((ScriptedObject)objects[command[1]]).type, ((ScriptedObject)objects[command[1]]).o, parseCoordinateVector(command[2], command[3]), double.Parse(command[4]), b));
         }
         private Point parsePointFromVector(Vector2 v)
         {
@@ -536,7 +551,11 @@ namespace CORA
         }
         public void execute()
         {
-            needsNextCommand = true;
+            if (!hasExecuted)
+            {
+                hasExecuted = true;
+                needsNextCommand = true;
+            }
         }
         public void end()
         {
@@ -551,10 +570,17 @@ namespace CORA
             selectedIndex = 0;
             needsNextCommand = false;
         }
-        public void cleanupEvent(HandledEvent e)
+        public void addCleanupEvent(HandledEvent e)
         {
-            events.Remove(e);
-            GC.Collect();
+            cleanup.Add(e);
+        }
+        public void cleanupEvents()
+        {
+            while (cleanup.Count != 0)
+            {
+                events.Remove(cleanup[0]);
+                cleanup.RemoveAt(0);
+            }
         }
         public void drawThis(drawPacket pack)
         {
@@ -562,7 +588,6 @@ namespace CORA
                 e.drawThis(pack);
         }
     }
-
     public class ScriptedObject
     {
         public Object o;

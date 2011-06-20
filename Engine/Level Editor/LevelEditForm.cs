@@ -174,7 +174,7 @@ namespace CORA
                     state.walls.Add(movingPlatform);
                     break;
                 case DrawableType.pressurePlate:
-                    PressurePlate pressurePlate = new PressurePlate(new BoundingBox(new Vector3(0, 0, 0), new Vector3(50, 25, 0)), state, null, null);
+                    PressurePlate pressurePlate = new PressurePlate(new BoundingBox(new Vector3(0, 0, 0), new Vector3(50, 25, 0)), state, null, null, null);
                     lstBlocks.Items.Add(pressurePlate);
                     state.interactables.Add(pressurePlate);
                     break;
