@@ -1,5 +1,25 @@
 begin script runtutorial
-spawn doodad junk\\runtutorial c100 c100 $rundoodad
+spawnui doodad junk\\runtutorial 100 100 $rundoodad
 waittime 5000
 despawn $rundoodad
 @
+
+begin script jumptutorial
+spawnui doodad junk\\runtutorial 100 100 $rundoodad
+waittime 5000
+despawn $rundoodad
+@
+
+begin script doublejumptutorial
+spawnui doodad junk\\runtutorial 100 100 $rundoodad
+waittime 5000
+despawn $rundoodad
+@
+
+begin script controlpaneltutorial
+spawnui doodad junk\\runtutorial 100 100 $rundoodad
+waittime 5000
+despawn $rundoodad
+@
+
+

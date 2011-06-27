@@ -78,14 +78,14 @@ namespace CORA
         /// This method will do nothing, since this doodad is not animated.
         /// </summary>
         /// <param name="pack">see doPacket</param>
-        public virtual void doThis(doPacket pack)
+        public override void doThis(doPacket pack)
         {
         }
         /// <summary>
         /// This method will draw the doodad to the screen
         /// </summary>
         /// <param name="pack">see drawPacket</param>
-        public virtual void drawThis(drawPacket pack)
+        public override void drawThis(drawPacket pack)
         {
             pack.sb.Draw(sprite, position, Color.White);
         }

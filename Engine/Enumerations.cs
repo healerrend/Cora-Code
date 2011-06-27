@@ -73,6 +73,7 @@
     public enum CSLCommandType
     {
         spawn,
+        spawnui,
         create,
         delete,
         despawn,

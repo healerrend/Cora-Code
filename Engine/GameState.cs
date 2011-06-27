@@ -29,6 +29,7 @@ namespace CORA
         public doPacket doPack; //The doPacket, used to propagate the doThis method tree.
         public drawPacket drawPack; //The drawPacket, used to propagate the drawThis method tree.
         public ContentManager content; //The content manager, used to load assets.
+        public ContentManager phaseOutContent;
 
         public Player player; //The current object controlled by the player.
         public CollisionPoint playerPosition; //The current position of the player.

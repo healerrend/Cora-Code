@@ -18,6 +18,8 @@ namespace CORA
     public class PressurePlate : HitBoxInteractable
     {
         #region Instance Variables
+        Boolean canRepeat;
+        Boolean hasActivated;
         Delegate target; //The method that interacting with this object will invoke.
         DelegateParams parameters;
         #endregion
@@ -37,6 +39,19 @@ namespace CORA
             this.target = target;
             this.sprite = s;
             this.parameters = parameters;
+            canRepeat = true;
+            hasActivated = false;
+        }
+        public PressurePlate(BoundingBox b, LevelState l, Texture2D s, Delegate target, DelegateParams parameters, Boolean canRepeat)
+            : base(b, l, s)
+        {
+            level = l;
+            hitBox = b;
+            this.target = target;
+            this.sprite = s;
+            this.parameters = parameters;
+            this.canRepeat = canRepeat;
+            hasActivated = false;
         }
         /// <summary>
         /// This method will check to see if a collision has occurred. If one has, then it will call its delegate method.
@@ -45,8 +60,13 @@ namespace CORA
         /// <param name="p">The object interacting with this.</param>
         public override Boolean effectPlayer(doPacket pack, Player p)
         {
-            //METHOD CALL TO DETECT COLLISIONS HERE
-            target.DynamicInvoke(parameters);
+            if(!hasActivated || canRepeat)
+                if (hitBox.Intersects(p.hitBox))
+                {
+                    target.DynamicInvoke(parameters);
+                    hasActivated = true;
+                    return true;
+                }
             return false;
         }
         /// <summary>

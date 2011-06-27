@@ -193,7 +193,7 @@ namespace CORA
                 }
             }
             foreach (LevelBlock w in walls)
-                w.doThis(pack, nullPlayer);
+                w.doThis(pack);
             foreach (Doodad d in doodads)
                 d.doThis(pack);
             foreach (HitBoxInteractable i in interactables)

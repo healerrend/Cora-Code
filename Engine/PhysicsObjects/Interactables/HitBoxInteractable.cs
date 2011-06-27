@@ -108,12 +108,12 @@ namespace CORA
         /// Override is not required. This method will execute any internal logic for the interactable.
         /// </summary>
         /// <param name="pack">see doPacket</param>
-        public virtual void doThis(doPacket pack) { }
+        public override void doThis(doPacket pack) { }
         /// <summary>
         /// Override required. This method will draw this object.
         /// </summary>
         /// <param name="pack">see drawPacket</param>
-        public virtual void drawThis(drawPacket pack)
+        public override void drawThis(drawPacket pack)
         {
             if(visible && sprite != null)
                 pack.sb.Draw(sprite, drawRect, Color.White);

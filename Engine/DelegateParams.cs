@@ -35,4 +35,13 @@ namespace CORA
             this.eventID = eventID;
         }
     }
+    public class OpenDoorParams : DelegateParams
+    {
+        public Door door;
+        public OpenDoorParams(LevelState level, Door door)
+            : base(level)
+        {
+            this.door = door;
+        }
+    }
 }

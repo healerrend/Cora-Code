@@ -23,12 +23,17 @@ namespace CORA
 
         public Texture2D corasprite;
         public Texture2D runtutorial;
-        public GameEvent runTuturialEvent;
+        public GameEvent loadingEvent;
         public delegate void act(DelegateParams parameters);
-        act activateRunTutorial = Level1State.ActivateRunTutorial;
-        public static void ActivateRunTutorial(DelegateParams parameters)
+        act activateTutorial = Level1State.ActivateTutorial;
+        act openDoor = Level1State.ToggleDoor;
+        public static void ActivateTutorial(DelegateParams parameters)
         {
             ((EventParams)parameters).level.events[((EventParams)parameters).eventID].execute();
+        }
+        public static void ToggleDoor(DelegateParams parameters)
+        {
+            ((OpenDoorParams)parameters).door.toggle();
         }
 
         public Level1State() { }
@@ -41,11 +46,18 @@ namespace CORA
             corasprite = content.Load<Texture2D>("junk\\walksheet");
             TextureLoader.grayblock = content.Load<Texture2D>("junk\\graysquare");
             TextureLoader.redsquare = content.Load<Texture2D>("RealAssets\\redsquare");
-
-            runTuturialEvent = new GameEvent(state, this);
-            runTuturialEvent.loadScript("..\\..\\..\\code\\content\\scripts\\level1.csl", "runtutorial", content);
-            events.Add(runTuturialEvent);
-
+            loadingEvent = new GameEvent(state, this);
+            loadingEvent.loadScript("..\\..\\..\\code\\content\\scripts\\level1.csl", "runtutorial", content);
+            events.Add(loadingEvent);
+            loadingEvent = new GameEvent(state, this);
+            loadingEvent.loadScript("..\\..\\..\\code\\content\\scripts\\level1.csl", "jumptutorial", content);
+            events.Add(loadingEvent);
+            loadingEvent = new GameEvent(state, this);
+            loadingEvent.loadScript("..\\..\\..\\code\\content\\scripts\\level1.csl", "doublejumptutorial", content);
+            events.Add(loadingEvent);
+            loadingEvent = new GameEvent(state, this);
+            loadingEvent.loadScript("..\\..\\..\\code\\content\\scripts\\level1.csl", "controlpaneltutorial", content);
+            events.Add(loadingEvent);
 
             this.levelSize.X = 3350;
             this.levelSize.Y = 720;
@@ -65,14 +77,19 @@ namespace CORA
             this.walls.Add(new Wall(new BoundingBox(new Vector3(1100, 170, 0), new Vector3(3050, 220, 0)), this));
             this.walls.Add(new Wall(new BoundingBox(new Vector3(3000, 0, 0), new Vector3(3050, 170, 0)), this));
             this.walls.Add(new Slope(this, new Point(1900, 420), new Point(2500, 330)));
-            //this.walls.Add(new Slope(this, new Point(0, 370), new Point(450, 250)));
-
-            interactables.Add(new PressurePlate(new BoundingBox(new Vector3(100,600,0), new Vector3(150,650,0)), this, null, activateRunTutorial, new EventParams(this, 0)));
-
             foreach (LevelBlock w in walls)
             {
                 w.Sprite = TextureLoader.grayblock;
             }
+            //this.walls.Add(new Slope(this, new Point(0, 370), new Point(450, 250)));
+            this.walls.Add(new Door(this, new Wall(new BoundingBox(new Vector3(2775, 220, 0), new Vector3(2825, 330, 0)), this, null), new Animation(TextureLoader.grayblock, 50, 110, 1, 2, false, 100), 1500));
+            this.interactables.Add(new ControlPanel(new BoundingBox(new Vector3(2600, 250, 0), new Vector3(2630, 280, 0)), this, TextureLoader.redsquare, openDoor, new OpenDoorParams(this, (Door)walls.Last<LevelBlock>()), false));
+
+            interactables.Add(new PressurePlate(new BoundingBox(new Vector3(100, 600, 0), new Vector3(150, 650, 0)), this, null, activateTutorial, new EventParams(this, 0)));
+            interactables.Add(new PressurePlate(new BoundingBox(new Vector3(1400, 500, 0), new Vector3(1500, 600, 0)), this, null, activateTutorial, new EventParams(this, 1)));
+            interactables.Add(new PressurePlate(new BoundingBox(new Vector3(100, 600, 0), new Vector3(150, 650, 0)), this, null, activateTutorial, new EventParams(this, 2)));
+            interactables.Add(new PressurePlate(new BoundingBox(new Vector3(100, 600, 0), new Vector3(150, 650, 0)), this, null, activateTutorial, new EventParams(this, 3)));
+            
             player = new Player(corasprite, walls, this);
 
 

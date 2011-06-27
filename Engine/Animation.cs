@@ -133,7 +133,6 @@ namespace CORA
         /// <param name="pack">see doPacket</param>
         public void doThis(doPacket pack)
         {
-
             animator += pack.time.ElapsedGameTime.TotalMilliseconds;
             if (animator >= milliseconds)
             {
@@ -156,6 +155,10 @@ namespace CORA
             currentRow = i;
             currentFrame = 0;
             animator = 0;
+        }
+        public void setFrame(int i)
+        {
+            currentFrame = i;
         }
         /// <summary>
         /// Mutator method for sprite

@@ -15,8 +15,8 @@ namespace CORA
 {
     public class FadeEvent : HandledEvent
     {
-        public Color begin;
-        public Color end;
+        public Color cBegin;
+        public Color cEnd;
         public Color current;
         public double duration;
         public double timer;
@@ -35,16 +35,16 @@ namespace CORA
             this.duration = duration;
             timer = 0;
             String[] color = begin.Split(',');
-            this.begin = new Color(byte.Parse(color[0]), byte.Parse(color[1]), byte.Parse(color[2]));
+            this.cBegin = new Color(byte.Parse(color[0]), byte.Parse(color[1]), byte.Parse(color[2]));
             color = end.Split(',');
-            this.end = new Color(byte.Parse(color[0]), byte.Parse(color[1]), byte.Parse(color[2]));
-            rBegin = this.begin.R;
-            gBegin = this.begin.G;
-            bBegin = this.begin.B;
-            rEnd = this.end.R;
-            gEnd = this.end.G;
-            bEnd = this.end.B;
-            current = this.begin;
+            this.cEnd = new Color(byte.Parse(color[0]), byte.Parse(color[1]), byte.Parse(color[2]));
+            rBegin = this.cBegin.R;
+            gBegin = this.cBegin.G;
+            bBegin = this.cBegin.B;
+            rEnd = this.cEnd.R;
+            gEnd = this.cEnd.G;
+            bEnd = this.cEnd.B;
+            current = this.cBegin;
             if (rEnd < rBegin)
                 rFadeIn = false;
             if (gEnd < gBegin)
@@ -71,9 +71,9 @@ namespace CORA
 
                 if (timer >= duration)
                 {
-                    current.R = end.R;
-                    current.G = end.G;
-                    current.B = end.B;
+                    current.R = cEnd.R;
+                    current.G = cEnd.G;
+                    current.B = cEnd.B;
                     gameState.tint = current;
                     this.end();
                 }

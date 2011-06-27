@@ -162,25 +162,28 @@ namespace CORA
                     if (!isDashing)
                     {
                         //Release minibots
-                        if (pack.controller.release())
+                        if (pack.controller.release() && pack.state.acceptPlayerInput)
                             this.releaseBots(pack);
-                        if (pack.controller.isRight() == 1) //Set or clear isRight
+                        if (pack.controller.isRight() == 1 && pack.state.acceptPlayerInput) //Set or clear isRight
                             isRight = true;
-                        else if (pack.controller.isRight() == -1)
+                        else if (pack.controller.isRight() == -1 && pack.state.acceptPlayerInput)
                             isRight = false;
                         doPhysics(pack); //Do physics.
                         //Horizontal movement
-                        acceleration.X = pack.controller.moveStickHoriz() * HORIZONTAL_ACCELERATION;
+                        if (pack.state.acceptPlayerInput)
+                            acceleration.X = pack.controller.moveStickHoriz() * HORIZONTAL_ACCELERATION;
+                        else
+                            acceleration.X = 0;
                         if (isAirborne)
                             acceleration.X *= .25f; //Horizontal air control 25% of normal
-                        if (pack.controller.run())
+                        if (pack.controller.run() && pack.state.acceptPlayerInput)
                             acceleration.X *= 2; //This needs to be a variable instead
                         if (!isAirborne && pack.controller.moveStickHoriz() == 0)
                             acceleration.X = velocity.X * -.25f; //Friction
 
                         if (!hasDoubleJumped)
                         {
-                            if (pack.controller.run())
+                            if (pack.controller.run() && pack.state.acceptPlayerInput)
                             {
                                 if (velocity.X > 10) //Maximum velocity (NEED A CONSTANT FOR THIS)
                                     velocity.X = 10;
@@ -199,7 +202,7 @@ namespace CORA
                         if (velocity.Y > 75)
                             velocity.Y = 75; //Max
 
-                        if (pack.controller.dash() && !isAirborne)
+                        if (pack.controller.dash() && !isAirborne && pack.state.acceptPlayerInput)
                         {
                             elapsedTime = 0;
 
@@ -208,11 +211,11 @@ namespace CORA
                         }
 
 
-                        if (pack.controller.jump() && !isAirborne) //Jumping
+                        if (pack.controller.jump() && !isAirborne && pack.state.acceptPlayerInput) //Jumping
                         {
                             velocity.Y = JUMP_SPEED;
                         }
-                        else if (pack.controller.jump() && isAirborne && !hasDoubleJumped) //Double Jumping
+                        else if (pack.controller.jump() && isAirborne && !hasDoubleJumped && pack.state.acceptPlayerInput) //Double Jumping
                         {
                             if (isRight)
                             {
@@ -281,12 +284,12 @@ namespace CORA
                     }
                     else
                     {
-                        if (pack.controller.up() || pack.controller.climb()) //If the player climbs the ledge
+                        if ((pack.controller.up() || pack.controller.climb()) && pack.state.acceptPlayerInput) //If the player climbs the ledge
                         {
                             isClimbing = true;
                             velocity.Y = -10;
                         }
-                        else if (pack.controller.jump()) //If the player jumps from the ledge
+                        else if (pack.controller.jump() && pack.state.acceptPlayerInput) //If the player jumps from the ledge
                         {
                             isHanging = false;
                             if (!isRight)

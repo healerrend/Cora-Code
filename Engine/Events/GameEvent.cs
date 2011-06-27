@@ -57,6 +57,7 @@ namespace CORA
                     CSLCommandType o = (CSLCommandType)Enum.Parse(typeof(CSLCommandType), command[0]);
                     switch (o)
                     {
+                        case CSLCommandType.spawnui:
                         case CSLCommandType.spawn:
                             Texture2D tex = c.Load<Texture2D>(command[2]);
                             if(!textures.ContainsKey(command[2]))
@@ -74,6 +75,7 @@ namespace CORA
                 }
                 if(reader.Peek() == '@')
                     commands.Add(new string[1]{"end"});
+                reader.Close();
             }
             catch (Exception ex)
             {}
@@ -102,7 +104,7 @@ namespace CORA
             switch (o)
             {
                 case CSLCommandType.create:
-                    parseCreate(false);
+                    parseCreate(false, false);
                     break;
                 case CSLCommandType.delete:
                     parseDelete(false);
@@ -141,7 +143,10 @@ namespace CORA
                     parseSlideCamera();
                     break;
                 case CSLCommandType.spawn:
-                    parseCreate(true);
+                    parseCreate(true, false);
+                    break;
+                case CSLCommandType.spawnui:
+                    parseCreate(false, true);
                     break;
                 case CSLCommandType.takePlayerControl:
                     parseTakePlayerControl();
@@ -159,7 +164,7 @@ namespace CORA
                     break;
             }            
         }
-        public void parseCreate(Boolean spawn)
+        public void parseCreate(Boolean spawn, Boolean UI)
         {
             if (command[1].StartsWith("$") && spawn)
             {
@@ -215,6 +220,8 @@ namespace CORA
                         }
                         if (spawn)
                             level.doodads.Add((AnimatedDoodad)b);
+                        if (UI)
+                            level.UI.Add((AnimatedDoodad)b);
                         break;
                     case CSLObjectType.batterybot:
                         //FILL IN AFTER DEFINING
@@ -238,6 +245,8 @@ namespace CORA
                         }
                         if (spawn)
                             level.doodads.Add((Doodad)b);
+                        if (UI)
+                            level.UI.Add((Doodad)b);
                         break;
                     case CSLObjectType.door:
                         //FILL IN AFTER DEFINING
@@ -258,6 +267,8 @@ namespace CORA
                         }
                         if (spawn)
                             level.interactables.Add((ElevatorSurface)b);
+                        if (UI)
+                            level.UI.Add((ElevatorSurface)b);
                         break;
                     case CSLObjectType.hangingledge:
                         //FILL IN SOMETIME?
@@ -275,6 +286,8 @@ namespace CORA
                         }
                         if (spawn)
                             level.walls.Add((MovingPlatform)b);
+                        if (UI)
+                            level.UI.Add((MovingPlatform)b);
                         break;
                     case CSLObjectType.player:
                         Player p = new Player((Texture2D)textures[command[1]], level.walls, level);
@@ -313,6 +326,8 @@ namespace CORA
                         }
                         if (spawn)
                             level.walls.Add((Rust)b);
+                        if (UI)
+                            level.UI.Add((Rust)b);
                         break;
                     case CSLObjectType.slope:
                         b = new Slope(level, parsePointFromVector(parseCoordinateVector(command[2], command[3])), parsePointFromVector(parseCoordinateVector(command[4], command[5])), (Texture2D)textures[command[1]]);
@@ -324,6 +339,8 @@ namespace CORA
                         }
                         if (spawn)
                             level.walls.Add((Slope)b);
+                        if (UI)
+                            level.UI.Add((Slope)b);
                         break;
                     case CSLObjectType.swarmbot:
                         //FILL IN AFTER DEFINING
@@ -349,6 +366,8 @@ namespace CORA
                         }
                         if (spawn)
                             level.walls.Add((Wall)b);
+                        if (UI)
+                            level.UI.Add((Wall)b);
                         break;
                 }
             }
@@ -368,8 +387,10 @@ namespace CORA
                         level.objects.Remove((GameObject)o);
                     else if (level.interactables.Contains(((ScriptedObject)o).o))
                         level.interactables.Remove((HitBoxInteractable)((ScriptedObject)o).o);
-                    else if (level.walls.Contains(o))
+                    else if (level.walls.Contains(((ScriptedObject)o).o))
                         level.walls.Remove((LevelBlock)((ScriptedObject)o).o);
+                    else if (level.UI.Contains(((ScriptedObject)o).o))
+                        level.UI.Remove((Drawable)((ScriptedObject)o).o);
                 }
             }
         }

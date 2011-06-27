@@ -65,5 +65,8 @@ namespace CORA
         {}
         public virtual void Export(LevelEditState l, StringBuilder texturesDec, StringBuilder texturesDef, StringBuilder mainString)
         {}
+        public virtual void drawThis(drawPacket pack)
+        {}
+        public virtual void doThis(doPacket pack) { }
     }
 }

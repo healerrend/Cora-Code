@@ -18,6 +18,8 @@ namespace CORA
     public class ControlPanel : HitBoxInteractable
     {
         #region Instance Variables
+        Boolean canRepeat;
+        Boolean hasActivated;
         Delegate target; //The method which this interactable will dynamically invoke
         DelegateParams parameters;
         #endregion
@@ -37,6 +39,19 @@ namespace CORA
             this.target = target;
             this.Sprite = s;
             this.parameters = parameters;
+            canRepeat = true;
+            hasActivated = false;
+        }
+        public ControlPanel(BoundingBox b, LevelState l, Texture2D s, Delegate target, DelegateParams parameters, Boolean canRepeat)
+            : base(b, l, s)
+        {
+            hitBox = b;
+            level = l;
+            this.target = target;
+            this.Sprite = s;
+            this.parameters = parameters;
+            this.canRepeat = canRepeat;
+            hasActivated = false;
         }
         /// <summary>
         /// This method will check for collisions. If a collision is detected, then check to see if this is being activated. If it is, affect the player.
@@ -46,19 +61,21 @@ namespace CORA
         public override Boolean effectPlayer(doPacket pack, Player p)
         {
             //This needs to activate only on collision
-            if (enabled && p.hitBox.Intersects(hitBox))
-            {
-                if (pack.controller.use() || (p.type == InteractorType.toolbot && ((Toolbot)p).isReleased))
-                {
-                    target.DynamicInvoke(parameters);
-                    return true;
-                }
-                else if (p.type == InteractorType.toolbot)
-                {
-                    int x = 0; //Toolbot interaction animation wot wot
-                    return true;
-                }
-            }
+            if(!hasActivated || canRepeat)
+                if (enabled && p.hitBox.Intersects(hitBox))
+                    if (pack.controller.use() || (p.type == InteractorType.toolbot && ((Toolbot)p).isReleased))
+                    {
+                        target.DynamicInvoke(parameters);
+                        hasActivated = true;
+                        return true;
+                    }
+                    else if (p.type == InteractorType.toolbot)
+                    {
+                        int x = 0; //Toolbot interaction animation wot wot
+                        target.DynamicInvoke(parameters);
+                        hasActivated = true;
+                        return true;
+                    }
             return false;
         }
         /// <summary>

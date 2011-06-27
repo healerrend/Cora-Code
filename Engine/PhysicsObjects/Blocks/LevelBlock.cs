@@ -148,13 +148,13 @@ namespace CORA
         /// This Draw will be called during the Draw World phase of drawing.
         /// </summary>
         /// <param name="pack">See drawPacket</param>
-        public virtual void drawThis(drawPacket pack) { }
+        public override void drawThis(drawPacket pack) { }
         /// <summary>
         /// Override is optional. This method is called on any block which must have some internal logic completed at any time a collision is not detected.
         /// </summary>
         /// <param name="pack">See doPacked</param>
         /// <param name="player">The current player</param>
-        public virtual void doThis(doPacket pack, Player player) { }
+        public override void doThis(doPacket pack) { }
         /// <summary>
         /// Returns the X and Y coordinates of the minimum point on the hitbox of this block.
         /// </summary>

@@ -95,7 +95,7 @@ namespace CORA
         /// </summary>
         /// <param name="pack">see doPacket</param>
         /// <param name="player">The current player</param>
-        public override void doThis(doPacket pack, Player player)
+        public override void doThis(doPacket pack)
         {
             if (disappearing)
             {

@@ -26,6 +26,7 @@ namespace CORA
         public List<HitBoxInteractable> interactables; //A container for all HitBoxInteractables for this level
         public List<Doodad> doodads;
         public List<GameEvent> events;
+        public List<Drawable> UI;
         #endregion
         public LevelState()
         {
@@ -35,6 +36,7 @@ namespace CORA
             doodads = new List<Doodad>();
             background = new List<Doodad>();
             events = new List<GameEvent>();
+            UI = new List<Drawable>();
         }
         /// <summary>
         /// The do method of a level state should propagate the do chain throughout all objects the level contains.
@@ -46,7 +48,7 @@ namespace CORA
             foreach (GameEvent e in events)
                 e.doThis(pack);
             foreach (LevelBlock l in walls)
-                l.doThis(pack, player);
+                l.doThis(pack);
             foreach (HitBoxInteractable i in interactables)
                 i.doThis(pack);
             foreach (GameObject o in objects)
@@ -90,6 +92,8 @@ namespace CORA
             pack.sb.GraphicsDevice.SetRenderTarget(pack.state.UI);
             pack.sb.Begin();
             pack.sb.Draw(pack.state.effects, Vector2.Zero, Color.White);
+            foreach (Drawable d in UI)
+                d.drawThis(pack);
             pack.sb.End();
         }
         /// <summary>
