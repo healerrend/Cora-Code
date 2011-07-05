@@ -21,6 +21,6 @@ namespace CORA
         {
             this.level = level;
         }
-        public void
+        //public void
     }
 }
