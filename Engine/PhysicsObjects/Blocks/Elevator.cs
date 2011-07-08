@@ -21,6 +21,13 @@ namespace CORA
         {
             this.level = level;
         }
-        //public void
+        public override Vector2 detectCollision(List<CollisionPoint> positions, CollisionPoint pos, Vector2 trajectory, BoundingSphere nearby, Player player)
+        {
+            throw new NotImplementedException();
+        }
+        public override bool intersects(BoundingBox b)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Xna.Framework;
@@ -30,6 +31,7 @@ namespace CORA
         public drawPacket drawPack; //The drawPacket, used to propagate the drawThis method tree.
         public ContentManager content; //The content manager, used to load assets.
         public ContentManager phaseOutContent;
+        public ContentManager standByContent;
 
         public Player player; //The current object controlled by the player.
         public CollisionPoint playerPosition; //The current position of the player.
@@ -39,6 +41,11 @@ namespace CORA
         public State state; //The game's current state.
         public State tempState; //A temporary state overriding the game's current state, such as a pause menu or in-game cinematic.
         public State newState; //A state waiting to be switched to
+        public State standByState; //A state that is [being] loaded for a seamless transition
+        public State phaseOutState;
+        public Boolean finishedSeamlessLoad;
+        public Boolean doDrawPhaseOutState;
+        public Boolean doDrawStandByState;
 
         SpriteBatch sb; //The sprite batch, used to draw things.
         public Controller controller; //The controller, updated every frame.
@@ -74,6 +81,9 @@ namespace CORA
             cameraPosition = new Point();
             paused = false;
             frameCaptured = false;
+            finishedSeamlessLoad = false;
+            doDrawPhaseOutState = false;
+            doDrawStandByState = false;
         }
         /// <summary>
         /// This method fires to begin the game.
@@ -102,14 +112,16 @@ namespace CORA
                 TextureLoader.RussellSquare = content.Load<SpriteFont>("realassets\\russellsquare");
                 TextureLoader.SketchFlowPrint = content.Load<SpriteFont>("realassets\\sketchflowprint");
                 GC.Collect(); //After unloading content, collect the garbage. This will probably be done anyway, but we want to ensure it.
-
-                
             }
             controller.updateController(); //Always update the controller and the time
             doPack.time = gameTime;
             if (!paused) //THIS LOGIC NEEDS TO BE REVISED
             {
                 state.doThis(doPack);
+                if (doDrawPhaseOutState)
+                    phaseOutState.doThis(doPack);
+                if (doDrawStandByState)
+                    standByState.doThis(doPack);
             }
             else
             {
@@ -126,9 +138,25 @@ namespace CORA
             {
                 drawPack.time = gameTime;
                 state.drawWorld(drawPack);
+                if (doDrawPhaseOutState)
+                    phaseOutState.drawWorld(drawPack);
+                if (doDrawStandByState)
+                    standByState.drawWorld(drawPack);
                 state.drawEffects(drawPack);
+                if (doDrawPhaseOutState)
+                    phaseOutState.drawEffects(drawPack);
+                if (doDrawStandByState)
+                    standByState.drawEffects(drawPack);
                 state.drawUI(drawPack);
+                if (doDrawPhaseOutState)
+                    phaseOutState.drawUI(drawPack);
+                if (doDrawStandByState)
+                    standByState.drawUI(drawPack);
                 state.drawToPause(drawPack);
+                if (doDrawPhaseOutState)
+                    phaseOutState.drawToPause(drawPack);
+                if (doDrawStandByState)
+                    standByState.drawToPause(drawPack);
                 drawPack.sb.GraphicsDevice.SetRenderTarget(null);
                 frameCaptured = true;
             }
@@ -140,9 +168,25 @@ namespace CORA
             {
                 drawPack.time = gameTime;
                 state.drawWorld(drawPack);
+                if (doDrawPhaseOutState)
+                    phaseOutState.drawWorld(drawPack);
+                if (doDrawStandByState)
+                    standByState.drawWorld(drawPack);
                 state.drawEffects(drawPack);
+                if (doDrawPhaseOutState)
+                    phaseOutState.drawEffects(drawPack);
+                if (doDrawStandByState)
+                    standByState.drawEffects(drawPack);
                 state.drawUI(drawPack);
+                if (doDrawPhaseOutState)
+                    phaseOutState.drawUI(drawPack);
+                if (doDrawStandByState)
+                    standByState.drawUI(drawPack);
                 state.drawToScreen(drawPack);
+                if (doDrawPhaseOutState)
+                    phaseOutState.drawToScreen(drawPack);
+                if (doDrawStandByState)
+                    standByState.drawToScreen(drawPack);
             }
         }
         /// <summary>
@@ -212,6 +256,37 @@ namespace CORA
         {
             controller = c;
             doPack.controller = c;
+        }
+        public void initiateLoadStandByState(LevelState s)
+        {
+            Thread loadStandByStateThread = new Thread(loadStandByState);
+            loadStandByStateThread.Start(s);
+        }
+        public void loadStandByState(object s)
+        {
+            standByContent = new ContentManager(content.ServiceProvider, content.RootDirectory);
+
+            ((LevelState)s).loadState(this, standByContent);
+            finishedSeamlessLoad = true;
+        }
+        public void activateStandByState()
+        {
+            doDrawStandByState = true;
+        }
+        public void loadSeamlessly()
+        {
+            phaseOutState = state;
+            phaseOutContent = content;
+            state = standByState;
+            content = standByContent;
+            doDrawPhaseOutState = true;
+            doDrawStandByState = false;
+        }
+        public void phaseOutOldContent()
+        {
+            doDrawPhaseOutState = false;
+            phaseOutContent.Dispose();
+            phaseOutState = null;
         }
     }
 }
