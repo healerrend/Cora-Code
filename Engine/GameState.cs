@@ -30,8 +30,6 @@ namespace CORA
         public doPacket doPack; //The doPacket, used to propagate the doThis method tree.
         public drawPacket drawPack; //The drawPacket, used to propagate the drawThis method tree.
         public ContentManager content; //The content manager, used to load assets.
-        public ContentManager phaseOutContent;
-        public ContentManager standByContent;
 
         public Player player; //The current object controlled by the player.
         public CollisionPoint playerPosition; //The current position of the player.
@@ -46,6 +44,12 @@ namespace CORA
         public Boolean finishedSeamlessLoad;
         public Boolean doDrawPhaseOutState;
         public Boolean doDrawStandByState;
+        public Boolean cameraAutonomous;
+
+        public float minX;
+        public float minY;
+        public float maxX;
+        public float maxY;
 
         SpriteBatch sb; //The sprite batch, used to draw things.
         public Controller controller; //The controller, updated every frame.
@@ -84,6 +88,11 @@ namespace CORA
             finishedSeamlessLoad = false;
             doDrawPhaseOutState = false;
             doDrawStandByState = false;
+            cameraAutonomous = true;
+            minX = 0;
+            maxX = 0;
+            minY = 0;
+            maxY = 0;
         }
         /// <summary>
         /// This method fires to begin the game.
@@ -122,10 +131,31 @@ namespace CORA
                     phaseOutState.doThis(doPack);
                 if (doDrawStandByState)
                     standByState.doThis(doPack);
+
             }
             else
             {
                 tempState.doThis(doPack);
+            }
+            if(cameraAutonomous)
+            {
+                if (playerPosition.X - cameraPosition.X < 400) //This will keep the camera on the player, but inside the level.
+                    cameraPosition.X = (int)playerPosition.X - 400;
+                if (playerPosition.X - cameraPosition.X > 870)
+                    cameraPosition.X = (int)playerPosition.X - 870;
+                if (playerPosition.Y - cameraPosition.Y < 360)
+                    cameraPosition.Y = (int)playerPosition.Y - 360;
+                if (playerPosition.Y - cameraPosition.Y > 620)
+                    cameraPosition.Y = (int)playerPosition.Y - 620;
+
+                if (cameraPosition.X < minX)
+                    cameraPosition.X = (int)minX;
+                if (cameraPosition.Y < minY)
+                    cameraPosition.Y = (int)minY;
+                if (cameraPosition.X > maxX)
+                    cameraPosition.X = (int)maxX;
+                if (cameraPosition.Y > maxY)
+                    cameraPosition.Y = (int)maxY;
             }
         }
         /// <summary>
@@ -264,9 +294,7 @@ namespace CORA
         }
         public void loadStandByState(object s)
         {
-            standByContent = new ContentManager(content.ServiceProvider, content.RootDirectory);
-
-            ((LevelState)s).loadState(this, standByContent);
+            ((LevelState)s).loadState(this, content);
             finishedSeamlessLoad = true;
         }
         public void activateStandByState()
@@ -276,16 +304,13 @@ namespace CORA
         public void loadSeamlessly()
         {
             phaseOutState = state;
-            phaseOutContent = content;
             state = standByState;
-            content = standByContent;
             doDrawPhaseOutState = true;
             doDrawStandByState = false;
         }
         public void phaseOutOldContent()
         {
             doDrawPhaseOutState = false;
-            phaseOutContent.Dispose();
             phaseOutState = null;
         }
     }

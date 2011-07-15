@@ -99,23 +99,6 @@ namespace CORA
         public override void doThis(doPacket pack)
         {
             base.doThis(pack);
-            if (pack.state.playerPosition.X - pack.state.cameraPosition.X < 400) //This will keep the camera on the player, but inside the level.
-                pack.state.cameraPosition.X = (int)pack.state.playerPosition.X - 400;
-            if (pack.state.playerPosition.X - pack.state.cameraPosition.X > 870)
-                pack.state.cameraPosition.X = (int)pack.state.playerPosition.X - 870;
-            if (pack.state.playerPosition.Y - pack.state.cameraPosition.Y < 360)
-                pack.state.cameraPosition.Y = (int)pack.state.playerPosition.Y - 360;
-            if (pack.state.playerPosition.Y - pack.state.cameraPosition.Y > 620)
-                pack.state.cameraPosition.Y = (int)pack.state.playerPosition.Y - 620;
-
-            if (pack.state.cameraPosition.X < 0)
-                pack.state.cameraPosition.X = 0;
-            if (pack.state.cameraPosition.Y < 0)
-                pack.state.cameraPosition.Y = 0;
-            if (pack.state.cameraPosition.X > levelSize.X - 1280)
-                pack.state.cameraPosition.X = (int)levelSize.X - 1280;
-            if (pack.state.cameraPosition.Y > levelSize.Y - 720)
-                pack.state.cameraPosition.Y = (int)levelSize.Y - 720;
         }
         public override void drawWorld(drawPacket pack)
         {

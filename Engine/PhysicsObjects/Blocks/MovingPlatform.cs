@@ -32,6 +32,7 @@ namespace CORA
         protected Boolean isDown; //True if this moving platform is currently moving down.
         protected Boolean setAnimator; //True if animator needs to be reset.
         protected Boolean trajectorySet; //True if the player's movement has been corrected this cycle.
+        protected Boolean isActive;
         #endregion
         #region Static Object Pool
         public static Vector2 difference; //Never used, probably don't need this?
@@ -168,6 +169,12 @@ namespace CORA
         {
             get { return isDown; }
         }
+        [Browsable(false)]
+        public Boolean IsActive
+        {
+            get { return isActive; }
+            set { isActive = value; }
+        }
 
         #endregion
         /// <summary>
@@ -264,11 +271,14 @@ namespace CORA
                 {
                     if (dimensions.Min.X < pos.X && pos.X < dimensions.Max.X) //IF: pos.x is within the X dimensions of the hitbox
                     {
-                        playerSpeed.X = curSpeed.X; //Move the player
-                        playerSpeed.Y = curSpeed.Y;
-                        player.movePlayer(playerSpeed);
+                        if (isActive)
+                        {
+                            playerSpeed.X = curSpeed.X; //Move the player
+                            playerSpeed.Y = curSpeed.Y;
+                            player.movePlayer(playerSpeed);
+                        }
                         player.onGround();
-                        trajectorySet = true; //We have now moved the player
+                        trajectorySet = true; //We have now moved the player, if needed.
                     }
                 }
                 if (pos == positions[11]) //IF: We are done detecting collision
@@ -291,7 +301,7 @@ namespace CORA
         /// <param name="player">The current player</param>
         public override void doThis(doPacket pack)
         {
-            if (!pack.state.paused) //If the game is not paused
+            if (!pack.state.paused && isActive) //If the game is not paused and this moving platform is active
             {
                 if (setAnimator) //If the animator needs to be reset...
                 {

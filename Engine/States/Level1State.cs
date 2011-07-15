@@ -58,9 +58,12 @@ namespace CORA
             loadingEvent = new GameEvent(state, this);
             loadingEvent.loadScript("..\\..\\..\\code\\content\\scripts\\level1.csl", "controlpaneltutorial", content);
             events.Add(loadingEvent);
-
+            /*
             this.levelSize.X = 3350;
             this.levelSize.Y = 720;
+             */
+            state.maxX += 3350;
+            state.minY -= 720;
             this.walls.Add(new Wall(new BoundingBox(new Vector3(-34, -2, 0), new Vector3(-1, 740, 0)), this));
             this.walls.Add(new Wall(new BoundingBox(new Vector3(0, 620, 0), new Vector3(1150, 670, 0)), this));
             //this.walls.Add(new Wall(new BoundingBox(new Vector3(200, 617, 0), new Vector3(400, 622, 0)), this));
@@ -76,6 +79,10 @@ namespace CORA
             this.walls.Add(new Wall(new BoundingBox(new Vector3(1050, 220, 0), new Vector3(1150, 270, 0)), this));
             this.walls.Add(new Wall(new BoundingBox(new Vector3(1100, 170, 0), new Vector3(3050, 220, 0)), this));
             this.walls.Add(new Wall(new BoundingBox(new Vector3(3000, 0, 0), new Vector3(3050, 170, 0)), this));
+            MovingPlatform m = new MovingPlatform(new BoundingBox(new Vector3(3000, 330, 0), new Vector3(3300, 370, 0)), this, new Point(3000, 330), new Point(3000, -630), MovingPlatformRotationType.Bouncing);
+            m.IsActive = false;
+            this.walls.Add(m);
+
             this.walls.Add(new Slope(this, new Point(1900, 420), new Point(2500, 330)));
             foreach (LevelBlock w in walls)
             {
@@ -99,23 +106,6 @@ namespace CORA
         public override void doThis(doPacket pack)
         {
             base.doThis(pack);
-            if (pack.state.playerPosition.X - pack.state.cameraPosition.X < 400) //This will keep the camera on the player, but inside the level.
-                pack.state.cameraPosition.X = (int)pack.state.playerPosition.X - 400;
-            if (pack.state.playerPosition.X - pack.state.cameraPosition.X > 870)
-                pack.state.cameraPosition.X = (int)pack.state.playerPosition.X - 870;
-            if (pack.state.playerPosition.Y - pack.state.cameraPosition.Y < 360)
-                pack.state.cameraPosition.Y = (int)pack.state.playerPosition.Y - 360;
-            if (pack.state.playerPosition.Y - pack.state.cameraPosition.Y > 620)
-                pack.state.cameraPosition.Y = (int)pack.state.playerPosition.Y - 620;
-
-            if (pack.state.cameraPosition.X < 0)
-                pack.state.cameraPosition.X = 0;
-            if (pack.state.cameraPosition.Y < 0)
-                pack.state.cameraPosition.Y = 0;
-            if (pack.state.cameraPosition.X > levelSize.X - 1280)
-                pack.state.cameraPosition.X = (int)levelSize.X - 1280;
-            if (pack.state.cameraPosition.Y > levelSize.Y - 720)
-                pack.state.cameraPosition.Y = (int)levelSize.Y - 720;
         }
         public override void drawWorld(drawPacket pack)
         {

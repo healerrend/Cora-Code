@@ -107,5 +107,17 @@ namespace CORA
             pack.sb.Draw(pack.state.UI, Vector2.Zero, Color.White);
             pack.sb.End();
         }
+
+        public void translate(Vector2 trajectory)
+        {
+            foreach (Doodad d in background)
+                d.moveThis(trajectory);
+            foreach (LevelBlock w in walls)
+                w.moveThis(trajectory);
+            foreach (HitBoxInteractable h in interactables)
+                h.moveThis(trajectory);
+            foreach (GameObject o in objects)
+                o.moveThis(trajectory);
+        }
     }
 }
