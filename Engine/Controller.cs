@@ -179,7 +179,7 @@ namespace CORA
         /// <returns></returns>
         public Boolean jump()
         {
-            return isButton(btnJump);
+            return (isButton(btnJump) || isKey(keyJump));
         }
         /// <summary>
         /// Returns true if the run button is currently pressed. NO KEYBOARD FUNCTIONALITY YET.
@@ -242,6 +242,14 @@ namespace CORA
         public Boolean release()
         {
             return (isButton(btnRelease) || isKey(keyRelease));
+        }
+        public Boolean keyboardLeft()
+        {
+            return kNew.IsKeyDown(keyLeft);
+        }
+        public Boolean keyboardRight()
+        {
+            return kNew.IsKeyDown(keyRight);
         }
         #endregion
     }

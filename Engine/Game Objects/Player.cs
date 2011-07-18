@@ -182,14 +182,19 @@ namespace CORA
                         doPhysics(pack); //Do physics.
                         //Horizontal movement
                         if (pack.state.acceptPlayerInput)
-                            acceleration.X = pack.controller.moveStickHoriz() * HORIZONTAL_ACCELERATION;
+                            if(pack.controller.keyboardLeft())
+                                acceleration.X = -HORIZONTAL_ACCELERATION;
+                            else if(pack.controller.keyboardRight())
+                                acceleration.X = HORIZONTAL_ACCELERATION;
+                            else
+                                acceleration.X = pack.controller.moveStickHoriz() * HORIZONTAL_ACCELERATION;
                         else
                             acceleration.X = 0;
                         if (isAirborne)
                             acceleration.X *= .25f; //Horizontal air control 25% of normal
                         if (pack.controller.run() && pack.state.acceptPlayerInput)
                             acceleration.X *= 2; //This needs to be a variable instead
-                        if (!isAirborne && pack.controller.moveStickHoriz() == 0)
+                        if (!isAirborne && pack.controller.moveStickHoriz() == 0 && !(pack.controller.keyboardLeft() || pack.controller.keyboardRight()))
                             acceleration.X = velocity.X * -.25f; //Friction
 
                         if (!hasDoubleJumped)
@@ -247,7 +252,7 @@ namespace CORA
 
                     nearby.Center.X = points[6].X; //Set coords of nearby
                     nearby.Center.Y = points[6].Y;
-                    nearby.Radius = 150f; //Should put some logic here
+                    nearby.Radius = 100 + (2 * velocity.Length()); //Should put some logic here
 
                     //Generic collision detection
                     detectCollisions(pack);
