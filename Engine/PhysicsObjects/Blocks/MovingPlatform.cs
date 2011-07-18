@@ -326,10 +326,19 @@ namespace CORA
                 dimensions.Max.Y = dimensions.Min.Y + height;
                 if (t > 1) //If the cycle is finished...
                 {
-                    setAnimator = true; //...reverse the platform.
-                    isRight = !isRight;
-                    isDown = !isDown;
-                    calculateSpeed();
+                    if (repeatX)
+                    {
+                        setAnimator = true; //...reverse the platform.
+                        isRight = !isRight;
+                        isDown = !isDown;
+                        calculateSpeed();
+                    }
+                    else
+                    {
+                        curSpeed.X = 0;
+                        curSpeed.Y = 0;
+                        isActive = false;
+                    }
                 }
             }
         }

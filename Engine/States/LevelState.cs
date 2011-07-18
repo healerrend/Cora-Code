@@ -107,7 +107,7 @@ namespace CORA
             pack.sb.Draw(pack.state.UI, Vector2.Zero, Color.White);
             pack.sb.End();
         }
-
+        public virtual void translate(){}
         public void translate(Vector2 trajectory)
         {
             foreach (Doodad d in background)
@@ -117,7 +117,8 @@ namespace CORA
             foreach (HitBoxInteractable h in interactables)
                 h.moveThis(trajectory);
             foreach (GameObject o in objects)
-                o.moveThis(trajectory);
+                if(o != state.player)
+                    o.moveThis(trajectory);
         }
     }
 }

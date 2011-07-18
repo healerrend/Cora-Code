@@ -157,6 +157,8 @@ namespace CORA
                 if (cameraPosition.Y > maxY)
                     cameraPosition.Y = (int)maxY;
             }
+            if (player != null)
+                player.hasGoneThisFrame = false;
         }
         /// <summary>
         /// This is the method from which the draw chain begins. It will begin the 4-step draw.
@@ -287,19 +289,23 @@ namespace CORA
             controller = c;
             doPack.controller = c;
         }
-        public void initiateLoadStandByState(LevelState s)
+        public void initiateLoadStandByState()
         {
             Thread loadStandByStateThread = new Thread(loadStandByState);
-            loadStandByStateThread.Start(s);
+            loadStandByStateThread.Start();
         }
-        public void loadStandByState(object s)
+        public void loadStandByState()
         {
-            ((LevelState)s).loadState(this, content);
+            (standByState).loadState(this, content);
             finishedSeamlessLoad = true;
         }
         public void activateStandByState()
         {
             doDrawStandByState = true;
+            ((LevelState)standByState).translate();
+            player.standByWalls = ((LevelState)standByState).walls;
+            player.standByInteractables = ((LevelState)standByState).interactables;
+            player.detectStandByWalls = true;
         }
         public void loadSeamlessly()
         {
@@ -307,11 +313,18 @@ namespace CORA
             state = standByState;
             doDrawPhaseOutState = true;
             doDrawStandByState = false;
+            player.phaseOutWalls = player.walls;
+            player.phaseOutInteractables = player.interactables;
+            player.walls = player.standByWalls;
+            player.interactables = player.standByInteractables;
+            player.detectStandByWalls = false;
+            player.detectPhaseOutWalls = true;
         }
         public void phaseOutOldContent()
         {
             doDrawPhaseOutState = false;
             phaseOutState = null;
+            player.detectPhaseOutWalls = false;
         }
     }
 }

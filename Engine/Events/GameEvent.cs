@@ -118,6 +118,9 @@ namespace CORA
                 case CSLCommandType.drawableVisible:
                     parseDrawableVisibile();
                     break;
+                case CSLCommandType.drawNextLevel:
+                    parseDrawNextLevel();
+                    break;
                 case CSLCommandType.end:
                     end();
                     break;
@@ -129,6 +132,9 @@ namespace CORA
                     break;
                 case CSLCommandType.go:
                     parseGo();
+                    break;
+                case CSLCommandType.loadNextLevel:
+                    parseLoadNextLevel();
                     break;
                 case CSLCommandType.move:
                     parseMove();
@@ -148,8 +154,14 @@ namespace CORA
                 case CSLCommandType.spawnui:
                     parseCreate(false, true);
                     break;
+                case CSLCommandType.switchLevels:
+                    parseSwitchLevels();
+                    break;
                 case CSLCommandType.takePlayerControl:
                     parseTakePlayerControl();
+                    break;
+                case CSLCommandType.unloadPreviousLevel:
+                    parseUnloadPreviousLevel();
                     break;
                 case CSLCommandType.waitforinstruction:
                     parseWaitForInstruction();
@@ -452,6 +464,10 @@ namespace CORA
                     break;
             }
         }
+        public void parseDrawNextLevel()
+        {
+            gameState.activateStandByState();
+        }
         public void parseFade()
         {
             events.Add(new FadeEvent(gameState, level, this, command[1], command[2], double.Parse(command[3])));
@@ -463,6 +479,10 @@ namespace CORA
         public void parseGo()
         {
             selectedIndex = int.Parse(command[1]);
+        }
+        public void parseLoadNextLevel()
+        {
+            gameState.initiateLoadStandByState();
         }
         public void parseMove()
         {
@@ -505,9 +525,17 @@ namespace CORA
         {
             events.Add(new SlideCameraEvent(gameState, level, this, int.Parse(command[1]), int.Parse(command[2]), double.Parse(command[3])));
         }
+        public void parseSwitchLevels()
+        {
+            gameState.loadSeamlessly();
+        }
         public void parseTakePlayerControl()
         {
             gameState.acceptPlayerInput = false;
+        }
+        public void parseUnloadPreviousLevel()
+        {
+            gameState.phaseOutOldContent();
         }
         public void parseWaitForInstruction()
         {

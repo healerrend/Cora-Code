@@ -24,12 +24,19 @@ namespace CORA
         public Boolean isRight; //True if the player is facing right, otherwise false.
         public Boolean isCrest; //Needed?
         public Boolean isAirborne; //True if the player is airborne, otherwise false.
+        public Boolean hasGoneThisFrame;
+        public Boolean detectStandByWalls;
+        public Boolean detectPhaseOutWalls;
 
         public Rectangle drawBox; //The rectangle to draw the sprite to
         public Rectangle animBox; //The area of the sprite to draw
 
         public List<LevelBlock> walls; //Points to the collection of level blocks in the level
+        public List<LevelBlock> standByWalls; //Points to the collection of level blocks in the level
+        public List<LevelBlock> phaseOutWalls; //Points to the collection of level blocks in the level
         public List<HitBoxInteractable> interactables; //Points to the collection of interactables in the level
+        public List<HitBoxInteractable> standByInteractables; //Points to the collection of interactables in the level
+        public List<HitBoxInteractable> phaseOutInteractables; //Points to the collection of interactables in the level
         public List<CollisionPoint> points; //This object's list of collision points.
         public HangingLedge currentLedge = null; //The ledge the player is currently hanging on.
         public Vector2 staticVelocity; //This velocity is used to move the player while on a moving hanging platform
@@ -67,10 +74,13 @@ namespace CORA
             this.position = position;
             nearby = new BoundingSphere(new Vector3(position.X, position.Y, 0f), 50);
             points = new List<CollisionPoint>();
+            hasGoneThisFrame = false;
             for (int i = 0; i < 12; i++) //Initialize the 12 collision points
             {
                 points.Add(new CollisionPoint());
             }
+            detectPhaseOutWalls = false;
+            detectStandByWalls = false;
         }
         /// <summary>
         /// Constructor
@@ -144,8 +154,9 @@ namespace CORA
         /// <param name="pack">see doPacket</param>
         public override void doThis(doPacket pack)
         {
-            if (!pack.state.paused && enabled) //IF: Not paused
+            if (!pack.state.paused && enabled && !hasGoneThisFrame) //IF: Not paused
             {
+                hasGoneThisFrame = true;
                 if (isDashing)
                 {
                     //Check ans see if enough time has passed:
@@ -252,12 +263,20 @@ namespace CORA
                     hitBox.Min.Y = points[0].Y;
                     hitBox.Max.Y = points[6].Y;
                     foreach (LevelBlock w in walls)
-                    {
                         if (w.intersects(hitBox))
-                        {
-                            //INSERT DEATH/DAMAGE BY CRUSHING HERE
-                        }
-                    }
+                        { }//INSERT DEATH/DAMAGE BY CRUSHING HERE
+                    if (detectStandByWalls)
+                        foreach (LevelBlock w in standByWalls)
+                            if (w.intersects(hitBox))
+                            {
+                                //INSERT DEATH/DAMAGE BY CRUSHING HERE
+                            }
+                    if(detectPhaseOutWalls)
+                        foreach (LevelBlock w in walls)
+                            if (w.intersects(hitBox))
+                            {
+                                //INSERT DEATH/DAMAGE BY CRUSHING HERE
+                            }
                 }
                 else if (isHanging) //IF: Hanging
                 {
@@ -569,15 +588,25 @@ namespace CORA
         protected virtual void detectCollisions(doPacket pack)
         {
             foreach (LevelBlock w in walls) //For each level block, check all 12 points
-            {
                 foreach (CollisionPoint p in points)
-                {
                     velocity = w.detectCollision(points, p, velocity, nearby, this);
-                }
-            }
             foreach (HitBoxInteractable h in interactables)
-            {
                 h.effectPlayer(pack, this); //For each interactable, check the hit box.
+            if (detectPhaseOutWalls)
+            {
+                foreach (LevelBlock w in phaseOutWalls) //For each level block, check all 12 points
+                    foreach (CollisionPoint p in points)
+                        velocity = w.detectCollision(points, p, velocity, nearby, this);
+                foreach (HitBoxInteractable h in phaseOutInteractables)
+                    h.effectPlayer(pack, this); //For each interactable, check the hit box.
+            }
+            if(detectStandByWalls)
+            {
+                foreach (LevelBlock w in standByWalls) //For each level block, check all 12 points
+                    foreach (CollisionPoint p in points)
+                        velocity = w.detectCollision(points, p, velocity, nearby, this);
+                foreach (HitBoxInteractable h in standByInteractables)
+                    h.effectPlayer(pack, this); //For each interactable, check the hit box.
             }
         }
         /// <summary>

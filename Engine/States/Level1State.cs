@@ -27,6 +27,9 @@ namespace CORA
         public delegate void act(DelegateParams parameters);
         act activateTutorial = Level1State.ActivateTutorial;
         act openDoor = Level1State.ToggleDoor;
+        act loadNextlevel = Level1State.LoadNextLevel;
+        act drawNextLevel = Level1State.DrawNextLevel;
+        act engageElevator = Level1State.EngageElevator;
         public static void ActivateTutorial(DelegateParams parameters)
         {
             ((EventParams)parameters).level.events[((EventParams)parameters).eventID].execute();
@@ -34,6 +37,19 @@ namespace CORA
         public static void ToggleDoor(DelegateParams parameters)
         {
             ((OpenDoorParams)parameters).door.toggle();
+        }
+        public static void LoadNextLevel(DelegateParams parameters)
+        {
+            ((GameStateParams)parameters).state.standByState = new Level1_2State();
+            ((GameStateParams)parameters).state.initiateLoadStandByState();
+        }
+        public static void DrawNextLevel(DelegateParams parameters)
+        {
+            ((GameStateParams)parameters).state.activateStandByState();
+        }
+        public static void EngageElevator(DelegateParams parameters)
+        {
+            ((MovingPlatform)((GenericObjectParams)parameters).o).IsActive = true;
         }
 
         public Level1State() { }
@@ -79,9 +95,12 @@ namespace CORA
             this.walls.Add(new Wall(new BoundingBox(new Vector3(1050, 220, 0), new Vector3(1150, 270, 0)), this));
             this.walls.Add(new Wall(new BoundingBox(new Vector3(1100, 170, 0), new Vector3(3050, 220, 0)), this));
             this.walls.Add(new Wall(new BoundingBox(new Vector3(3000, 0, 0), new Vector3(3050, 170, 0)), this));
-            MovingPlatform m = new MovingPlatform(new BoundingBox(new Vector3(3000, 330, 0), new Vector3(3300, 370, 0)), this, new Point(3000, 330), new Point(3000, -630), MovingPlatformRotationType.Bouncing);
+            MovingPlatform m = new MovingPlatform(new BoundingBox(new Vector3(3000, 330, 0), new Vector3(3300, 370, 0)), this, new Point(3000, 330), new Point(3000, -530), MovingPlatformRotationType.Bouncing, 7, false, true);
             m.IsActive = false;
+            m.RepeatY = false;
+            m.RepeatX = false;
             this.walls.Add(m);
+            interactables.Add(new PressurePlate(new BoundingBox(new Vector3(3250, 300, 0), new Vector3(3300, 320, 0)), this, null, engageElevator, new GenericObjectParams(this, m)));
 
             this.walls.Add(new Slope(this, new Point(1900, 420), new Point(2500, 330)));
             foreach (LevelBlock w in walls)
@@ -96,10 +115,14 @@ namespace CORA
             interactables.Add(new PressurePlate(new BoundingBox(new Vector3(1400, 500, 0), new Vector3(1500, 600, 0)), this, null, activateTutorial, new EventParams(this, 1)));
             interactables.Add(new PressurePlate(new BoundingBox(new Vector3(100, 600, 0), new Vector3(150, 650, 0)), this, null, activateTutorial, new EventParams(this, 2)));
             interactables.Add(new PressurePlate(new BoundingBox(new Vector3(100, 600, 0), new Vector3(150, 650, 0)), this, null, activateTutorial, new EventParams(this, 3)));
-            
-            player = new Player(corasprite, walls, this);
+            interactables.Add(new PressurePlate(new BoundingBox(new Vector3(100, 600, 0), new Vector3(150, 650, 0)), this, null, loadNextlevel, new GameStateParams(this, state), false));
+            interactables.Add(new PressurePlate(new BoundingBox(new Vector3(2000, 200, 0), new Vector3(3000, 600, 0)), this, null, drawNextLevel, new GameStateParams(this, state), false));
 
-
+            if (state.player == null)
+            {
+                player = new Player(corasprite, walls, this);
+                state.player = player;
+            }
             objects.Add(player);
             player.movePlayer(new Point(100, 600));
         }

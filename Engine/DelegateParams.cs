@@ -44,4 +44,21 @@ namespace CORA
             this.door = door;
         }
     }
+    public class GameStateParams : DelegateParams
+    {
+        public GameState state;
+        public GameStateParams(LevelState level, GameState state)
+            : base(level)
+        {
+            this.state = state;
+        }
+    }
+    public class GenericObjectParams : DelegateParams
+    {
+        public Object o;
+        public GenericObjectParams(LevelState level, Object o) : base (level)
+        {
+            this.o = o;
+        }
+    }
 }

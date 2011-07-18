@@ -90,7 +90,11 @@
         slideCamera,
         fade,
         go,
-        end
+        end,
+        loadNextLevel,
+        drawNextLevel,
+        switchLevels,
+        unloadPreviousLevel
     }
 
     public enum CSLObjectType

@@ -14,7 +14,7 @@ namespace CORA
     /// <summary>
     /// This is the test level state.
     /// </summary>
-    public class Level2State : LevelState
+    public class Level1_2State : LevelState
     {
         #region EventFlags
         public Boolean eventIsHappening = false;
@@ -25,18 +25,8 @@ namespace CORA
         public Texture2D runtutorial;
         public GameEvent loadingEvent;
         public delegate void act(DelegateParams parameters);
-        act activateTutorial;
-        act openDoor;
-        public static void ActivateTutorial(DelegateParams parameters)
-        {
-            ((EventParams)parameters).level.events[((EventParams)parameters).eventID].execute();
-        }
-        public static void ToggleDoor(DelegateParams parameters)
-        {
-            ((OpenDoorParams)parameters).door.toggle();
-        }
 
-        public Level2State() { }
+        public Level1_2State() { }
 
         public override void loadState(GameState state, ContentManager content)
         {
@@ -47,16 +37,18 @@ namespace CORA
             TextureLoader.grayblock = content.Load<Texture2D>("junk\\graysquare");
             TextureLoader.redsquare = content.Load<Texture2D>("RealAssets\\redsquare");
 
-            this.levelSize.X = 3500;
-            this.levelSize.Y = 1500;
-            this.walls.Add(new Wall(new BoundingBox(new Vector3(150, 250, 0), new Vector3(3500, 250, 0)), this));
-            this.walls.Add(new Wall(new BoundingBox(new Vector3(150, 250, 0), new Vector3(150, 1100, 0)), this));
+            //this.levelSize.X = 3500;
+            //this.levelSize.Y = 1500;
+            state.maxX += 3350;
+            state.minY -= 720;
+            this.walls.Add(new Wall(new BoundingBox(new Vector3(150, 200, 0), new Vector3(3500, 250, 0)), this));
+            this.walls.Add(new Wall(new BoundingBox(new Vector3(100, 250, 0), new Vector3(150, 1100, 0)), this));
             this.walls.Add(new Wall(new BoundingBox(new Vector3(400, 500, 0), new Vector3(450, 800, 0)), this));
             this.walls.Add(new Wall(new BoundingBox(new Vector3(400, 500, 0), new Vector3(1100, 550, 0)), this));
             this.walls.Add(new Wall(new BoundingBox(new Vector3(1050, 500, 0), new Vector3(1100, 1350, 0)), this));
             this.walls.Add(new Wall(new BoundingBox(new Vector3(1300, 500, 0), new Vector3(1350, 1200, 0)), this));
             this.walls.Add(new Wall(new BoundingBox(new Vector3(1300, 500, 0), new Vector3(1600, 550, 0)), this));
-            this.walls.Add(new Wall(new BoundingBox(new Vector3(2000, 500, 0), new Vector3(2600, 550, 0)), this));
+            this.walls.Add(new Wall(new BoundingBox(new Vector3(2000, 500, 0), new Vector3(2600, 540, 0)), this));
             this.walls.Add(new Wall(new BoundingBox(new Vector3(2800, 500, 0), new Vector3(3500, 550, 0)), this));
             this.walls.Add(new Wall(new BoundingBox(new Vector3(2800, 500, 0), new Vector3(2850, 1350, 0)), this));
 
@@ -82,23 +74,23 @@ namespace CORA
                 w.Sprite = TextureLoader.grayblock;
             }
             //this.walls.Add(new Slope(this, new Point(0, 370), new Point(450, 250)));
-            this.walls.Add(new Door(this, new Wall(new BoundingBox(new Vector3(2775, 220, 0), new Vector3(2825, 330, 0)), this, null), new Animation(TextureLoader.grayblock, 50, 110, 1, 2, false, 100), 1500));
-            this.interactables.Add(new ControlPanel(new BoundingBox(new Vector3(2600, 250, 0), new Vector3(2630, 280, 0)), this, TextureLoader.redsquare, openDoor, new OpenDoorParams(this, (Door)walls.Last<LevelBlock>()), false));
 
-            interactables.Add(new PressurePlate(new BoundingBox(new Vector3(100, 600, 0), new Vector3(150, 650, 0)), this, null, activateTutorial, new EventParams(this, 0)));
-            interactables.Add(new PressurePlate(new BoundingBox(new Vector3(1400, 500, 0), new Vector3(1500, 600, 0)), this, null, activateTutorial, new EventParams(this, 1)));
-            interactables.Add(new PressurePlate(new BoundingBox(new Vector3(100, 600, 0), new Vector3(150, 650, 0)), this, null, activateTutorial, new EventParams(this, 2)));
-            interactables.Add(new PressurePlate(new BoundingBox(new Vector3(100, 600, 0), new Vector3(150, 650, 0)), this, null, activateTutorial, new EventParams(this, 3)));
-            
-            player = new Player(corasprite, walls, this);
-
-
+            if (state.player == null)
+            {
+                player = new Player(corasprite, walls, this);
+                state.player = player;
+            }
+            else
+                player = state.player;
             objects.Add(player);
-            player.movePlayer(new Point(100, 600));
         }
         public override void doThis(doPacket pack)
         {
             base.doThis(pack);
+        }
+        public override void translate()
+        {
+            base.translate(new Vector2(2900,-920));
         }
         public override void drawWorld(drawPacket pack)
         {
