@@ -60,6 +60,7 @@ namespace CORA
         public Boolean acceptPlayerInput = true;
 
         public Color tint = Color.White;
+        public float GRAVITY; //The acceleration due to gravity for this object, if any.
 
         public Microsoft.Xna.Framework.Storage.StorageContainer storageContainer;
         public Microsoft.Xna.Framework.Storage.StorageDevice storageDevice;

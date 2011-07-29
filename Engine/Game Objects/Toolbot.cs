@@ -88,10 +88,21 @@ namespace CORA
         }
         private void doAI(doPacket pack)
         {
+            switch (aiType)
+            {
+                case 0:
+                    break;
+                case 1:
+                    aiFollowPlayer(pack);
+                    break;
+            }
+        }
+        private void aiFollowPlayer(doPacket Pack)
+        {
             //Follow player
             if (!isAirborne)
             {
-                float xDiff = position.X + 25 - level.player.position.X;
+                float xDiff = position.X + 75 - level.player.position.X;
                 if (xDiff < -250)
                 {
                     velocity.X = 7;
@@ -102,12 +113,12 @@ namespace CORA
                     velocity.X = -7;
                     isRight = false;
                 }
-                else if (xDiff < -7)
+                else if (xDiff < -95)
                 {
                     velocity.X = 5;
                     isRight = true;
                 }
-                else if (xDiff > 7)
+                else if (xDiff > 95)
                 {
                     velocity.X = -5;
                     isRight = false;

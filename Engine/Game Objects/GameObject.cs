@@ -26,7 +26,6 @@ namespace CORA
         public Boolean accelerationEnabled; //True if this object's acceleration should affect its velocity, otherwise false.
         public Texture2D sprite; //This object's sprite
         public BoundingBox hitBox; //This object's hit box.
-        public static float GRAVITY; //The acceleration due to gravity for this object, if any.
         public Boolean enabled = true;
         public Boolean visible = true;
         #endregion
@@ -58,7 +57,7 @@ namespace CORA
         {
             if (accelerationEnabled)
             {
-                acceleration.Y = GRAVITY;
+                acceleration.Y = pack.state.GRAVITY;
                 acceleration.X = 0;
             }
         }

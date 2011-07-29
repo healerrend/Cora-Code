@@ -273,9 +273,9 @@ namespace CORA
                     {
                         if (isActive)
                         {
-                            playerSpeed.X = curSpeed.X; //Move the player
-                            playerSpeed.Y = curSpeed.Y;
-                            player.movePlayer(playerSpeed);
+                            //playerSpeed.X = curSpeed.X; //Move the player
+                            //playerSpeed.Y = curSpeed.Y;
+                            //player.movePlayer(playerSpeed);
                         }
                         player.onGround();
                         trajectorySet = true; //We have now moved the player, if needed.
@@ -315,6 +315,15 @@ namespace CORA
                 float width = _Width;
                 float height = _Height;
                 if (isRight)
+                    difference.X = (begin.X + ((end.X - begin.X) * t)) - dimensions.Min.X; 
+                else
+                    difference.X = (end.X - ((end.X - begin.X) * t)) - dimensions.Min.X;
+                if (isDown)
+                    difference.Y = (begin.Y + ((end.Y - begin.Y) * t)) - dimensions.Min.Y;
+                else
+                    difference.Y = (end.Y - ((end.Y - begin.Y) * t)) - dimensions.Min.Y;
+                /*
+                if (isRight)
                     dimensions.Min.X = begin.X + ((end.X - begin.X) * t);
                 else
                     dimensions.Min.X = end.X - ((end.X - begin.X) * t);
@@ -322,8 +331,14 @@ namespace CORA
                     dimensions.Min.Y = begin.Y + ((end.Y - begin.Y) * t);
                 else
                     dimensions.Min.Y = end.Y - ((end.Y - begin.Y) * t);
+                 */
+                dimensions.Min.X += difference.X;
+                dimensions.Min.Y += difference.Y;
                 dimensions.Max.X = dimensions.Min.X + width;
                 dimensions.Max.Y = dimensions.Min.Y + height;
+                foreach (GameObject o in ((LevelState)pack.state.state).objects)
+                    if (this.intersects(o.hitBox))
+                        o.moveThis(difference);
                 if (t > 1) //If the cycle is finished...
                 {
                     if (repeatX)
@@ -335,8 +350,6 @@ namespace CORA
                     }
                     else
                     {
-                        curSpeed.X = 0;
-                        curSpeed.Y = 0;
                         isActive = false;
                     }
                 }

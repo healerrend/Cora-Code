@@ -23,6 +23,7 @@ namespace CORA
 
         public Texture2D corasprite;
         public Texture2D runtutorial;
+        public Texture2D toolbotsprite;
         public GameEvent loadingEvent;
         public delegate void act(DelegateParams parameters);
 
@@ -34,6 +35,7 @@ namespace CORA
 
             TextureLoader.junkSpaceBG = content.Load<Texture2D>("junk\\space-1280x720");
             corasprite = content.Load<Texture2D>("junk\\walksheet");
+            toolbotsprite = content.Load<Texture2D>("junk\\walksheet");
             TextureLoader.grayblock = content.Load<Texture2D>("junk\\graysquare");
             TextureLoader.redsquare = content.Load<Texture2D>("RealAssets\\redsquare");
 
@@ -41,12 +43,14 @@ namespace CORA
             //this.levelSize.Y = 1500;
             state.maxX += 3350;
             state.minY -= 720;
+            this.walls.Add(new Wall(new BoundingBox(new Vector3(1650, 550, 0), new Vector3(1700, 735, 0)), this));
             this.walls.Add(new Wall(new BoundingBox(new Vector3(150, 200, 0), new Vector3(3500, 250, 0)), this));
             this.walls.Add(new Wall(new BoundingBox(new Vector3(100, 250, 0), new Vector3(150, 1100, 0)), this));
-            this.walls.Add(new Wall(new BoundingBox(new Vector3(400, 500, 0), new Vector3(450, 800, 0)), this));
+            this.walls.Add(new Wall(new BoundingBox(new Vector3(400, 500, 0), new Vector3(450, 1000, 0)), this));
             this.walls.Add(new Wall(new BoundingBox(new Vector3(400, 500, 0), new Vector3(1100, 550, 0)), this));
+            this.walls.Add(new Wall(new BoundingBox(new Vector3(1100, 500, 0), new Vector3(1300, 550, 0)), this));
             this.walls.Add(new Wall(new BoundingBox(new Vector3(1050, 500, 0), new Vector3(1100, 1350, 0)), this));
-            this.walls.Add(new Wall(new BoundingBox(new Vector3(1300, 500, 0), new Vector3(1350, 1200, 0)), this));
+            this.walls.Add(new Wall(new BoundingBox(new Vector3(1300, 500, 0), new Vector3(1350, 1190, 0)), this));
             this.walls.Add(new Wall(new BoundingBox(new Vector3(1300, 500, 0), new Vector3(1600, 550, 0)), this));
             this.walls.Add(new Wall(new BoundingBox(new Vector3(2000, 500, 0), new Vector3(2600, 540, 0)), this));
             this.walls.Add(new Wall(new BoundingBox(new Vector3(2800, 500, 0), new Vector3(3500, 550, 0)), this));
@@ -55,18 +59,22 @@ namespace CORA
             this.walls.Add(new Wall(new BoundingBox(new Vector3(1050, 1300, 0), new Vector3(2850, 1350, 0)), this));
             this.walls.Add(new Wall(new BoundingBox(new Vector3(2200, 500, 0), new Vector3(2250, 1225, 0)), this));
             this.walls.Add(new Wall(new BoundingBox(new Vector3(1600, 1700, 0), new Vector3(2000, 750, 0)), this));
-            this.walls.Add(new Wall(new BoundingBox(new Vector3(1450, 750, 0), new Vector3(1500, 900, 0)), this));
-            this.walls.Add(new Wall(new BoundingBox(new Vector3(1450, 850, 0), new Vector3(1700, 900, 0)), this));
+            this.walls.Add(new Wall(new BoundingBox(new Vector3(1460, 750, 0), new Vector3(1500, 900, 0)), this));
+            this.walls.Add(new Wall(new BoundingBox(new Vector3(1460, 850, 0), new Vector3(1650, 900, 0)), this));
             this.walls.Add(new Wall(new BoundingBox(new Vector3(1850, 850, 0), new Vector3(1900, 900, 0)), this));
             this.walls.Add(new Wall(new BoundingBox(new Vector3(2000, 900, 0), new Vector3(2200, 950, 0)), this));
-            this.walls.Add(new Wall(new BoundingBox(new Vector3(1600, 900, 0), new Vector3(1700, 1050, 0)), this));
+            this.walls.Add(new Wall(new BoundingBox(new Vector3(1600, 900, 0), new Vector3(1650, 1050, 0)), this));
             this.walls.Add(new Wall(new BoundingBox(new Vector3(1600, 1000, 0), new Vector3(1950, 1050, 0)), this));
             this.walls.Add(new Wall(new BoundingBox(new Vector3(1900, 900, 0), new Vector3(1950, 1050, 0)), this));
 
             this.walls.Add(new Wall(new BoundingBox(new Vector3(1600, 1050, 0), new Vector3(2250, 1100, 0)), this));
 
             this.walls.Add(new Slope(this, new Point(1600,500), new Point(2000,700)));
+            this.walls.Add(new Wall(new BoundingBox(new Vector3(1650, 700, 0), new Vector3(2000, 735, 0)), this));
             this.walls.Add(new Slope(this, new Point(1900, 850), new Point(2000, 900)));
+
+            this.doodads.Add(new Doodad(TextureLoader.redsquare, new Vector2(1150, 1250)));
+            //this.objects.Add(new Toolbot(toolbotsprite, walls, this, new Vector2(1150, 1200)));
             
 
             foreach (LevelBlock w in walls)

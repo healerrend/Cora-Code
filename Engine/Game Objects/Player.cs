@@ -59,7 +59,7 @@ namespace CORA
         public float HORIZONTAL_ACCELERATION; //Like gravity but over instead of up
         public float RUN_MULTIPLIER; //How much faster you sprint than run
         public float JUMP_SPEED; //The velocity you are granted upward when you jump
-        public float DASH_VELOCITY_ACCELERATION = 2;
+        public float DASH_VELOCITY_ACCELERATION = 10;
         public float DOUBLE_JUMP_ACCELERATION_Y = -20; //Arbitrary number, based on horizonal acceleration.
         public float DOUBLE_JUMP_ACCELERATION_X = 55;
 
@@ -112,7 +112,6 @@ namespace CORA
             isAirborne = false;
             HORIZONTAL_ACCELERATION = 2;
             RUN_MULTIPLIER = 2f;
-            GRAVITY = 1.5f;
             JUMP_SPEED = -25;
             points = new List<CollisionPoint>();
             for (int i = 0; i < 12; i++) //Initialize the 12 collision points
@@ -175,9 +174,9 @@ namespace CORA
                         //Release minibots
                         if (pack.controller.release() && pack.state.acceptPlayerInput)
                             this.releaseBots(pack);
-                        if (pack.controller.isRight() == 1 && pack.state.acceptPlayerInput) //Set or clear isRight
+                        if ((pack.controller.isRight() == 1 || pack.controller.keyboardRight()) && pack.state.acceptPlayerInput) //Set or clear isRight
                             isRight = true;
-                        else if (pack.controller.isRight() == -1 && pack.state.acceptPlayerInput)
+                        else if ((pack.controller.isRight() == -1 ||pack.controller.keyboardLeft()) && pack.state.acceptPlayerInput)
                             isRight = false;
                         doPhysics(pack); //Do physics.
                         //Horizontal movement
@@ -221,8 +220,10 @@ namespace CORA
                         if (pack.controller.dash() && !isAirborne && pack.state.acceptPlayerInput)
                         {
                             elapsedTime = 0;
-
-                            velocity.X += DASH_VELOCITY_ACCELERATION;
+                            if (isRight)
+                                velocity.X = DASH_VELOCITY_ACCELERATION;
+                            else
+                                velocity.X = -DASH_VELOCITY_ACCELERATION;
                             isDashing = true;
                         }
 
@@ -252,12 +253,12 @@ namespace CORA
 
                     nearby.Center.X = points[6].X; //Set coords of nearby
                     nearby.Center.Y = points[6].Y;
-                    nearby.Radius = 100 + (2 * velocity.Length()); //Should put some logic here
+                    nearby.Radius = 200 + (2 * velocity.Length()); //Should put some logic here
 
                     //Generic collision detection
                     detectCollisions(pack);
                     //Finalize movement
-
+                    /*
                     foreach (CollisionPoint p in points) //Move each collision point to set
                     {
                         p.X += (int)velocity.X;
@@ -270,6 +271,8 @@ namespace CORA
                     foreach (LevelBlock w in walls)
                         if (w.intersects(hitBox))
                         { }//INSERT DEATH/DAMAGE BY CRUSHING HERE
+                     */
+                    finalizeMovement(pack);
                     if (detectStandByWalls)
                         foreach (LevelBlock w in standByWalls)
                             if (w.intersects(hitBox))
@@ -366,6 +369,8 @@ namespace CORA
             hitBox.Max.X = points[6].X;
             hitBox.Min.Y = points[0].Y;
             hitBox.Max.Y = points[6].Y;
+            position.X = points[6].X;
+            position.Y = points[6].Y;
             foreach (LevelBlock w in walls)
             {
                 if (w.intersects(hitBox))

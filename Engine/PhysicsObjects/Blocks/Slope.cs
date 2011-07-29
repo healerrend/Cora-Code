@@ -219,7 +219,7 @@ namespace CORA
                     (!ascendingRight && pos == positions[9]))
                 {
                     if ((pos.Y <= 5 + ((slope * pos.X) + intercept) && //IF: pos crosses the slope's line, with a 5 pixel leeway. (Without leeway, we have a weird physics effect,
-                        ((pos.Y + trajectory.Y) > (slope * (pos.X + trajectory.X)) + intercept))) //where the slope would launch the player into the air.)
+                        ((pos.Y + trajectory.Y) > (slope * (pos.X + trajectory.X)) + intercept - 5))) //where the slope would launch the player into the air.)
                     {
                         //Collision is detected.
                         if (trajectory.X < 1) //If the trajectory is close to vertical...
@@ -243,7 +243,7 @@ namespace CORA
                         }
                     }
                 }
-                else if ((ascendingRight && pos == positions[0]) || (!ascendingRight && pos == positions[3]))
+                else if (pos == positions[0] || pos == positions[1] || pos == positions[2] || pos == positions[3])
                 {
                     if((pos.Y >= height + ((slope * pos.X) + intercept) - 5) && ((pos.Y + trajectory.Y) < (slope * (pos.X + trajectory.X)) + intercept + height))
                     {
@@ -326,6 +326,10 @@ namespace CORA
             return true;
              */
             return false;
+        }
+        public override bool intersects(BoundingSphere s)
+        {
+            throw new NotImplementedException();
         }
         /// <summary>
         /// This will move the hit box of this block, as well as moving the start and end positions of the slope and re-calculate the Y intercept.

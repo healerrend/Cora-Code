@@ -141,7 +141,7 @@ namespace CORA
                         else
                         {
                             if (Math.Abs(top) <= Math.Abs(right))
-                                postCollision.Y -= (top + 1);
+                                postCollision.Y += (top);
                             else
                                 postCollision.X += (right + 1);
                         }
@@ -177,6 +177,10 @@ namespace CORA
         public override Boolean intersects(BoundingBox b)
         {
             return dimensions.Intersects(b);
+        }
+        public override bool intersects(BoundingSphere s)
+        {
+            return dimensions.Intersects(s);
         }
         /// <summary>
         /// Draws the wall. NOTE: Needs to support different sprites! Steps:

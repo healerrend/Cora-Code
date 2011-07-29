@@ -143,6 +143,7 @@ namespace CORA
         /// <param name="b">A bounding box to check for intersection.</param>
         /// <returns></returns>
         public abstract Boolean intersects(BoundingBox b);
+        public abstract Boolean intersects(BoundingSphere s);
         /// <summary>
         /// Override is optional. This method is called on any block which must be drawn to the screen. All drawing logic should be contained within this method. It should not update any variables or states.
         /// This Draw will be called during the Draw World phase of drawing.

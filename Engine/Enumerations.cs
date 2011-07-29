@@ -26,7 +26,8 @@
     public enum ParticleType
     {
         uninitialized,
-        firework
+        firework,
+        water
     }
     /// <summary>
     /// player is any entity directly controlled by the player. Minibots refer to any instance of that minibot, player controlled or not.

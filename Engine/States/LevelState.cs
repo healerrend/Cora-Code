@@ -94,6 +94,8 @@ namespace CORA
             pack.sb.Draw(pack.state.effects, Vector2.Zero, Color.White);
             foreach (Drawable d in UI)
                 d.drawThis(pack);
+            //DEBUG
+            pack.sb.DrawString(TextureLoader.QuartzMS, pack.state.playerPosition.X.ToString() + "," + pack.state.playerPosition.Y.ToString(), new Vector2(550, 55), Color.Black);
             pack.sb.End();
         }
         /// <summary>
@@ -116,6 +118,8 @@ namespace CORA
                 w.moveThis(trajectory);
             foreach (HitBoxInteractable h in interactables)
                 h.moveThis(trajectory);
+            foreach (Doodad d in doodads)
+                d.moveThis(trajectory);
             foreach (GameObject o in objects)
                 if(o != state.player)
                     o.moveThis(trajectory);

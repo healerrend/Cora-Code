@@ -29,5 +29,9 @@ namespace CORA
         {
             throw new NotImplementedException();
         }
+        public override bool intersects(BoundingSphere s)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

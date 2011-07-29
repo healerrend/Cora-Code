@@ -187,7 +187,7 @@ namespace CORA
         /// <returns></returns>
         public Boolean run()
         {
-            return cNew.IsButtonDown(btnRun);
+            return (cNew.IsButtonDown(btnRun) || kNew.IsKeyDown(keyRun));
         }
         /// <summary>
         /// Returns true if any button is being pressed. NO KEYBOARD FUNCTIONALITY YET.

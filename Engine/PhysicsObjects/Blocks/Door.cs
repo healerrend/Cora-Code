@@ -67,6 +67,12 @@ namespace CORA
                 return hitBox.intersects(b);
             return false;
         }
+        public override bool intersects(BoundingSphere s)
+        {
+            if (!isOpen)
+                return hitBox.intersects(s);
+            return false;
+        }
         public void toggle()
         {
             isMoving = true;

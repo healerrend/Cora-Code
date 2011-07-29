@@ -57,6 +57,7 @@ namespace CORA
         public override void loadState(GameState state, ContentManager content)
         {
             this.state = state;
+            this.state.GRAVITY = 1.5f;
 
             TextureLoader.junkSpaceBG = content.Load<Texture2D>("junk\\space-1280x720");
             corasprite = content.Load<Texture2D>("junk\\walksheet");
@@ -95,7 +96,7 @@ namespace CORA
             this.walls.Add(new Wall(new BoundingBox(new Vector3(1050, 220, 0), new Vector3(1150, 270, 0)), this));
             this.walls.Add(new Wall(new BoundingBox(new Vector3(1100, 170, 0), new Vector3(3050, 220, 0)), this));
             this.walls.Add(new Wall(new BoundingBox(new Vector3(3000, 0, 0), new Vector3(3050, 170, 0)), this));
-            MovingPlatform m = new MovingPlatform(new BoundingBox(new Vector3(3000, 330, 0), new Vector3(3300, 370, 0)), this, new Point(3000, 330), new Point(3000, -420), MovingPlatformRotationType.Bouncing, 7, false, true);
+            MovingPlatform m = new MovingPlatform(new BoundingBox(new Vector3(3050, 330, 0), new Vector3(3300, 370, 0)), this, new Point(3050, 330), new Point(3050, -420), MovingPlatformRotationType.Bouncing, 7, false, true);
             m.IsActive = false;
             m.RepeatY = false;
             m.RepeatX = false;

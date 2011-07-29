@@ -19,7 +19,11 @@ namespace CORA
         private Vector2 velocity; //The velocity of the particle
         private Vector2 acceleration; //The acceleration of the particle
         private BoundingSphere sphere; //The bounding sphere used for collision detection
+        private Texture2D sprite;
         private float radius; //The radius of this particle
+        #endregion
+        #region Sprites
+        private Texture2D waterSprite;
         #endregion
         /// <summary>
         /// Standard constructor. This is never actually called in game, it is only used for initialization.
@@ -27,6 +31,10 @@ namespace CORA
         public Particle()
         {
             type = ParticleType.uninitialized;
+        }
+        public void loadAssets(ContentManager content)
+        {
+
         }
         /// <summary>
         /// This method will convert the particle into a certain particle type.
@@ -80,6 +88,11 @@ namespace CORA
             //Stuff
 
         }
+        private void convertToWater(Vector2 trajectory)
+        {
+            this.velocity = trajectory;
+            this.sprite = waterSprite;
+        }
         #endregion
         /// <summary>
         /// This is the basic do method for the particle. Every active particle will call this every update.
@@ -87,8 +100,12 @@ namespace CORA
         /// <param name="pack">see doPacket</param>
         public void doThis(doPacket pack)
         {
-            //Stuff
-
+            switch (type)
+            {
+                case ParticleType.water:
+                    doWater(pack);
+                    break;
+            }
         }
         private int RandomNumber(int min, int max)
         {
@@ -104,6 +121,14 @@ namespace CORA
         private void doGarbage(doPacket pack)
         {
             //Stuff
+        }
+        private void doWater(doPacket pack)
+        {
+            velocity.Y += pack.state.GRAVITY;
+            //Detect collisions
+            foreach (LevelBlock b in ((LevelState)pack.state.state).walls)
+                if (b.intersects(sphere))
+                    b.Name = "hi";
         }
         #endregion
         /// <summary>
