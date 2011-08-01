@@ -16,6 +16,17 @@ namespace CORA
         public int aiType;
         public Boolean isActive;
         public static BoundingBox poolBox = new BoundingBox();
+        public Minibot(Texture2D s, List<LevelBlock> walls, LevelState l, Vector2 position, String identifier)
+            : base(position)
+        {
+            isActive = false;
+            this.walls = walls;
+            this.sprite = s;
+            this.level = l;
+            this.interactables = l.interactables;
+            aiType = 0;
+            this.identifier = identifier;
+        }
         public Minibot(Texture2D s, List<LevelBlock> walls, LevelState l, Vector2 position)
             : base(position)
         {

@@ -53,6 +53,11 @@ namespace CORA
             this.canRepeat = canRepeat;
             hasActivated = false;
         }
+        public override void drawThis(drawPacket pack)
+        {
+            if(sprite != null)
+                base.drawThis(pack);
+        }
         /// <summary>
         /// This method will check for collisions. If a collision is detected, then check to see if this is being activated. If it is, affect the player.
         /// </summary>

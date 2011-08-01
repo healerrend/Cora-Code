@@ -28,7 +28,8 @@ namespace CORA
         public Boolean hasExecuted = false;
         public Boolean instructionHasCompleted = false;
         public Boolean waitingForCommand = false;
-        public GameEvent(GameState gameState, LevelState level)
+        public string id;
+        public GameEvent(GameState gameState, LevelState level, string id)
         {
             this.gameState = gameState;
             this.level = level;
@@ -39,6 +40,7 @@ namespace CORA
             selectedIndex = 0;
             events = new List<HandledEvent>();
             cleanup = new List<HandledEvent>();
+            this.id = id;
         }
         public void loadScript(string path, string name, ContentManager c)
         {
@@ -103,6 +105,9 @@ namespace CORA
                 o = CSLCommandType.end;
             switch (o)
             {
+                case CSLCommandType.changebotai:
+                    parseChangeBotAi();
+                    break;
                 case CSLCommandType.create:
                     parseCreate(false, false);
                     break;
@@ -175,6 +180,23 @@ namespace CORA
                 default:
                     break;
             }            
+        }
+        public void parseChangeBotAi()
+        {
+            if (command[1].StartsWith("$"))
+            {
+                Minibot m = ((Minibot)((ScriptedObject)objects[command[1]]).o);
+                m.aiType = int.Parse(command[1]);
+            }
+            else
+            {
+                Minibot m = null;
+                foreach (GameObject o in ((LevelState)gameState.state).objects)
+                    if (o.identifier != null && o.identifier.Equals(command[1]))
+                        m = (Minibot)o;
+                if (m != null)
+                    m.aiType = int.Parse(command[2]);
+            }
         }
         public void parseCreate(Boolean spawn, Boolean UI)
         {

@@ -29,8 +29,8 @@ namespace CORA
     }
     public class EventParams : DelegateParams
     {
-        public int eventID;
-        public EventParams(LevelState level, int eventID) : base(level)
+        public string eventID;
+        public EventParams(LevelState level, string eventID) : base(level)
         {
             this.eventID = eventID;
         }
@@ -59,6 +59,17 @@ namespace CORA
         public GenericObjectParams(LevelState level, Object o) : base (level)
         {
             this.o = o;
+        }
+    }
+    public class DoubleObjectParams : DelegateParams
+    {
+        public Object o;
+        public Object p;
+        public DoubleObjectParams(LevelState level, Object o, Object p)
+            : base(level)
+        {
+            this.o = o;
+            this.p = p;
         }
     }
 }

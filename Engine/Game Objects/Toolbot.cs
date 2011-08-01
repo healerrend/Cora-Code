@@ -50,6 +50,41 @@ namespace CORA
             points[8].Y = position.Y + 50;
             points[9].Y = position.Y + 50;
         }
+        public Toolbot(Texture2D s, List<LevelBlock> walls, LevelState l, Vector2 position, string identifier)
+            : base(s, walls, l, position, identifier)
+        {
+            isReleased = false;
+            type = InteractorType.toolbot;
+            drawBox = new Rectangle(0, 0, 100, 100);
+            hitBox = new BoundingBox(new Vector3(0, 0, 0), new Vector3(0, 0, 0));
+            animBox = new Rectangle(0, 0, 100, 100);
+
+            points[0].X = position.X;
+            points[9].X = position.X;
+            points[10].X = position.X;
+            points[11].X = position.X;
+            points[1].X = position.X + 16;
+            points[8].X = position.X + 16;
+            points[2].X = position.X + 33;
+            points[7].X = position.X + 33;
+            points[3].X = position.X + 50;
+            points[6].X = position.X + 50;
+            points[4].X = position.X + 50;
+            points[5].X = position.X + 50;
+
+            points[0].Y = position.Y;
+            points[1].Y = position.Y;
+            points[2].Y = position.Y;
+            points[3].Y = position.Y;
+            points[4].Y = position.Y + 16;
+            points[11].Y = position.Y + 16;
+            points[5].Y = position.Y + 33;
+            points[10].Y = position.Y + 33;
+            points[6].Y = position.Y + 50;
+            points[7].Y = position.Y + 50;
+            points[8].Y = position.Y + 50;
+            points[9].Y = position.Y + 50;
+        }
         public override void Dock(Player p)
         {
             throw new NotImplementedException();

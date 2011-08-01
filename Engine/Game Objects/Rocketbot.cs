@@ -14,6 +14,7 @@ namespace CORA
     public class Rocketbot : Minibot
     {
         public Rocketbot(Texture2D s, List<LevelBlock> walls, LevelState l, Vector2 position) : base(s, walls, l, position) { }
+        public Rocketbot(Texture2D s, List<LevelBlock> walls, LevelState l, Vector2 position, string identifier) : base(s, walls, l, position, identifier) { }
         public override void Dock(Player p)
         {
             throw new NotImplementedException();

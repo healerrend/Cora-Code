@@ -327,5 +327,19 @@ namespace CORA
             phaseOutState = null;
             player.detectPhaseOutWalls = false;
         }
+        public static void ExecuteEvent(DelegateParams parameters)
+        {
+            foreach (GameEvent e in ((EventParams)parameters).level.events)
+                if (e.id.Equals(((EventParams)parameters).eventID))
+                    e.execute();
+        }
+        public static void LoadSeamlessly(DelegateParams parameters)
+        {
+            ((GameState)((GenericObjectParams)parameters).o).loadSeamlessly();
+        }
+        public static void PhaseOutPrevious(DelegateParams parameters)
+        {
+            ((GameState)((GenericObjectParams)parameters).o).phaseOutOldContent();
+        }
     }
 }

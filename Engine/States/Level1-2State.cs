@@ -26,6 +26,9 @@ namespace CORA
         public Texture2D toolbotsprite;
         public GameEvent loadingEvent;
         public delegate void act(DelegateParams parameters);
+        act executeEvent = GameState.ExecuteEvent;
+        act loadSeamlessly = GameState.LoadSeamlessly;
+        act phaseOutPrevious = GameState.PhaseOutPrevious;
 
         public Level1_2State() { }
 
@@ -38,6 +41,11 @@ namespace CORA
             toolbotsprite = content.Load<Texture2D>("junk\\walksheet");
             TextureLoader.grayblock = content.Load<Texture2D>("junk\\graysquare");
             TextureLoader.redsquare = content.Load<Texture2D>("RealAssets\\redsquare");
+
+            loadingEvent = new GameEvent(state, this, "activatetoolbot");
+            loadingEvent.loadScript("..\\..\\..\\code\\content\\scripts\\level1.csl", "activateToolbot", content);
+            events.Add(loadingEvent);
+
 
             //this.levelSize.X = 3500;
             //this.levelSize.Y = 1500;
@@ -73,8 +81,11 @@ namespace CORA
             this.walls.Add(new Wall(new BoundingBox(new Vector3(1650, 700, 0), new Vector3(2000, 735, 0)), this));
             this.walls.Add(new Slope(this, new Point(1900, 850), new Point(2000, 900)));
 
-            this.doodads.Add(new Doodad(TextureLoader.redsquare, new Vector2(1150, 1250)));
-            //this.objects.Add(new Toolbot(toolbotsprite, walls, this, new Vector2(1150, 1200)));
+            //this.doodads.Add(new Doodad(TextureLoader.redsquare, new Vector2(1150, 1250)));
+            this.objects.Add(new Toolbot(toolbotsprite, walls, this, new Vector2(1150, 1250), "toolbot"));
+            this.interactables.Add(new PressurePlate(new BoundingBox(new Vector3(200,750,0), new Vector3(500,850,0)), this, null, loadSeamlessly, new GenericObjectParams(this, state), false));
+            this.interactables.Add(new PressurePlate(new BoundingBox(new Vector3(500, 250, 0), new Vector3(700, 500, 0)), this, null, phaseOutPrevious, new GenericObjectParams(this, state), false)); 
+            this.interactables.Add(new ControlPanel(new BoundingBox(new Vector3(1125, 1200, 0), new Vector3(1175, 1200, 0)), this, null, executeEvent, new EventParams(this, "activatetoolbot"), false));
             
 
             foreach (LevelBlock w in walls)
@@ -99,6 +110,9 @@ namespace CORA
         public override void translate()
         {
             base.translate(new Vector2(2900,-920));
+            foreach (LevelBlock w in ((LevelState)state.state).walls)
+                if (w.Name.Equals("elevator"))
+                    this.walls.Add(w);
         }
         public override void drawWorld(drawPacket pack)
         {

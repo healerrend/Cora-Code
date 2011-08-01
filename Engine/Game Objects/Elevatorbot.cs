@@ -44,6 +44,16 @@ namespace CORA
             platform = new MovingPlatform(new BoundingBox(), l, new Point(-1, -1), new Point(-1, -1), MovingPlatformRotationType.Bouncing);
             ledge = new MovingHangingLedge(new BoundingBox(), l, TextureLoader.grayblock, new Point(-1, -1), true);
         }
+        public Elevatorbot(Texture2D s, List<LevelBlock> walls, LevelState l, Vector2 position, string identifier)
+            : base(s, walls, l, position, identifier)
+        {
+            animatorSet = false;
+            isElevating = false;
+            attachedSurface = null;
+            type = InteractorType.elevatorbot;
+            platform = new MovingPlatform(new BoundingBox(), l, new Point(-1, -1), new Point(-1, -1), MovingPlatformRotationType.Bouncing);
+            ledge = new MovingHangingLedge(new BoundingBox(), l, TextureLoader.grayblock, new Point(-1, -1), true);
+        }
         /// <summary>
         /// Called when this is launched and CORA is on the ground. This should walk forward until it runs out of batteries or finds a surface.
         /// </summary>
