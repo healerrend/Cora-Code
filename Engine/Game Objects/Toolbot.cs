@@ -23,6 +23,8 @@ namespace CORA
             drawBox = new Rectangle(0, 0, 100, 100);
             hitBox = new BoundingBox(new Vector3(0, 0, 0), new Vector3(0, 0, 0));
             animBox = new Rectangle(0, 0, 100, 100);
+            HORIZONTAL_ACCELERATION = 1f;
+            JUMP_SPEED = -20f;
 
             points[0].X = position.X;
             points[9].X = position.X;
@@ -58,6 +60,8 @@ namespace CORA
             drawBox = new Rectangle(0, 0, 100, 100);
             hitBox = new BoundingBox(new Vector3(0, 0, 0), new Vector3(0, 0, 0));
             animBox = new Rectangle(0, 0, 100, 100);
+            HORIZONTAL_ACCELERATION = 1f;
+            JUMP_SPEED = -20f;
 
             points[0].X = position.X;
             points[9].X = position.X;
@@ -100,9 +104,53 @@ namespace CORA
         public override void doThis(doPacket pack)
         {
             //Do physics
+            if ((pack.controller.isRight() == 1 || pack.controller.keyboardRight()) && pack.state.acceptPlayerInput && inControl) //Set or clear isRight
+                isRight = true;
+            else if ((pack.controller.isRight() == -1 || pack.controller.keyboardLeft()) && pack.state.acceptPlayerInput && inControl)
+                isRight = false;
             doPhysics(pack);
+            //Horizontal movement
+            if (pack.state.acceptPlayerInput && inControl)
+                if (pack.controller.keyboardLeft())
+                    acceleration.X = -HORIZONTAL_ACCELERATION;
+                else if (pack.controller.keyboardRight())
+                    acceleration.X = HORIZONTAL_ACCELERATION;
+                else
+                    acceleration.X = pack.controller.moveStickHoriz() * HORIZONTAL_ACCELERATION;
+            else
+                acceleration.X = 0;
+            if (isAirborne)
+                acceleration.X *= .25f; //Horizontal air control 25% of normal
+            if (pack.controller.run() && pack.state.acceptPlayerInput && inControl)
+                acceleration.X *= 2; //This needs to be a variable instead
+            if (!isAirborne && pack.controller.moveStickHoriz() == 0 && !(pack.controller.keyboardLeft() || pack.controller.keyboardRight()))
+                acceleration.X = velocity.X * -.25f; //Friction
+
+            if (!hasDoubleJumped)
+            {
+                if (pack.controller.run() && pack.state.acceptPlayerInput && inControl)
+                {
+                    if (velocity.X > 10) //Maximum velocity (NEED A CONSTANT FOR THIS)
+                        velocity.X = 10;
+                    if (velocity.X < -10)
+                        velocity.X = -10;
+                }
+                else
+                {
+                    if (velocity.X > 7) //Maximum velocity (NEED A CONSTANT FOR THIS)
+                        velocity.X = 7;
+                    if (velocity.X < -7)
+                        velocity.X = -7;
+                }
+            }
             velocity += acceleration;
-            if(enabled)
+            if (velocity.Y > 75)
+                velocity.Y = 75; //Max
+            if (pack.controller.jump() && !isAirborne && pack.state.acceptPlayerInput && inControl) //Jumping
+            {
+                velocity.Y = JUMP_SPEED;
+            }
+            if(enabled && !inControl)
                 doAI(pack);
             //Collision Detection
             nearby.Center.X = points[6].X; //Set coords of nearby

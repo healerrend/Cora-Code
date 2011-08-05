@@ -28,6 +28,7 @@ namespace CORA
         public BoundingBox hitBox; //This object's hit box.
         public Boolean enabled = true;
         public Boolean visible = true;
+        public Boolean inControl = false;
         public String identifier;
         #endregion
         /// <summary>

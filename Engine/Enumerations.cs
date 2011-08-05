@@ -96,7 +96,8 @@
         drawNextLevel,
         switchLevels,
         unloadPreviousLevel,
-        changebotai
+        changebotai,
+        assignbot
     }
 
     public enum CSLObjectType

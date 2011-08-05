@@ -24,4 +24,5 @@ despawn $rundoodad
 
 begin script activateToolbot
 changebotai toolbot 1
+assignbot toolbot
 @

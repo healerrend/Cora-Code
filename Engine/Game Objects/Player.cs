@@ -28,6 +28,8 @@ namespace CORA
         public Boolean detectStandByWalls;
         public Boolean detectPhaseOutWalls;
 
+        public Toolbot toolbotFollower;
+
         public Rectangle drawBox; //The rectangle to draw the sprite to
         public Rectangle animBox; //The area of the sprite to draw
 
@@ -101,6 +103,7 @@ namespace CORA
             animBox = new Rectangle(0, 0, 100, 100);
             poolVector = new Vector2();
             poolPoint = new Point();
+            inControl = true;
 
             level = l;
             walls = level.walls;
@@ -172,15 +175,15 @@ namespace CORA
                     if (!isDashing)
                     {
                         //Release minibots
-                        if (pack.controller.release() && pack.state.acceptPlayerInput)
+                        if (pack.controller.release() && pack.state.acceptPlayerInput && inControl)
                             this.releaseBots(pack);
-                        if ((pack.controller.isRight() == 1 || pack.controller.keyboardRight()) && pack.state.acceptPlayerInput) //Set or clear isRight
+                        if ((pack.controller.isRight() == 1 || pack.controller.keyboardRight()) && pack.state.acceptPlayerInput && inControl) //Set or clear isRight
                             isRight = true;
-                        else if ((pack.controller.isRight() == -1 ||pack.controller.keyboardLeft()) && pack.state.acceptPlayerInput)
+                        else if ((pack.controller.isRight() == -1 ||pack.controller.keyboardLeft()) && pack.state.acceptPlayerInput && inControl)
                             isRight = false;
                         doPhysics(pack); //Do physics.
                         //Horizontal movement
-                        if (pack.state.acceptPlayerInput)
+                        if (pack.state.acceptPlayerInput && inControl)
                             if(pack.controller.keyboardLeft())
                                 acceleration.X = -HORIZONTAL_ACCELERATION;
                             else if(pack.controller.keyboardRight())
@@ -191,14 +194,14 @@ namespace CORA
                             acceleration.X = 0;
                         if (isAirborne)
                             acceleration.X *= .25f; //Horizontal air control 25% of normal
-                        if (pack.controller.run() && pack.state.acceptPlayerInput)
+                        if (pack.controller.run() && pack.state.acceptPlayerInput && inControl)
                             acceleration.X *= 2; //This needs to be a variable instead
                         if (!isAirborne && pack.controller.moveStickHoriz() == 0 && !(pack.controller.keyboardLeft() || pack.controller.keyboardRight()))
                             acceleration.X = velocity.X * -.25f; //Friction
 
                         if (!hasDoubleJumped)
                         {
-                            if (pack.controller.run() && pack.state.acceptPlayerInput)
+                            if (pack.controller.run() && pack.state.acceptPlayerInput && inControl)
                             {
                                 if (velocity.X > 10) //Maximum velocity (NEED A CONSTANT FOR THIS)
                                     velocity.X = 10;
@@ -217,7 +220,7 @@ namespace CORA
                         if (velocity.Y > 75)
                             velocity.Y = 75; //Max
 
-                        if (pack.controller.dash() && !isAirborne && pack.state.acceptPlayerInput)
+                        if (pack.controller.dash() && !isAirborne && pack.state.acceptPlayerInput && inControl)
                         {
                             elapsedTime = 0;
                             if (isRight)
@@ -228,11 +231,11 @@ namespace CORA
                         }
 
 
-                        if (pack.controller.jump() && !isAirborne && pack.state.acceptPlayerInput) //Jumping
+                        if (pack.controller.jump() && !isAirborne && pack.state.acceptPlayerInput && inControl) //Jumping
                         {
                             velocity.Y = JUMP_SPEED;
                         }
-                        else if (pack.controller.jump() && isAirborne && !hasDoubleJumped && pack.state.acceptPlayerInput) //Double Jumping
+                        else if (pack.controller.jump() && isAirborne && !hasDoubleJumped && pack.state.acceptPlayerInput && inControl) //Double Jumping
                         {
                             if (isRight)
                             {
@@ -517,6 +520,13 @@ namespace CORA
         /// <param name="pack">see doPacket</param>
         private void releaseBots(doPacket pack)
         {
+            if (toolbotFollower != null)
+                this.inControl = false;
+            toolbotFollower.inControl = true;
+            this.level.player = toolbotFollower;
+            pack.state.player = toolbotFollower;
+            pack.state.playerPosition = toolbotFollower.points[6];
+            /*
             switch (selectedBot)
             {
                 case InteractorType.toolbot:
@@ -590,6 +600,7 @@ namespace CORA
                     }
                     break;
             }
+             */
         }
         /// <summary>
         /// This method will handle the player's collision detection.
@@ -629,6 +640,10 @@ namespace CORA
             movePlayer(trajectory);
             drawBox.X += (int)trajectory.X;
             drawBox.Y += (int)trajectory.Y;
+        }
+        public void setToolbot(Toolbot t)
+        {
+            toolbotFollower = t;
         }
     }
 }

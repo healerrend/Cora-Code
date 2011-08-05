@@ -105,6 +105,9 @@ namespace CORA
                 o = CSLCommandType.end;
             switch (o)
             {
+                case CSLCommandType.assignbot:
+                    parseAssignBot();
+                    break;
                 case CSLCommandType.changebotai:
                     parseChangeBotAi();
                     break;
@@ -180,6 +183,23 @@ namespace CORA
                 default:
                     break;
             }            
+        }
+        public void parseAssignBot()
+        {
+            if (command[1].StartsWith("$"))
+            {
+                Toolbot t = ((Toolbot)((ScriptedObject)objects[command[1]]).o);
+                gameState.player.setToolbot(t);
+            }
+            else
+            {
+                Toolbot t = null;
+                foreach (GameObject o in ((LevelState)gameState.state).objects)
+                    if (o.identifier != null && o.identifier.Equals(command[1]))
+                        t = (Toolbot)o;
+                if (t != null)
+                    gameState.player.setToolbot(t);
+            }
         }
         public void parseChangeBotAi()
         {
